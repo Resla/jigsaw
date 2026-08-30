@@ -209,4 +209,76 @@ export const galleryImages: GalleryImage[] = [
     seoDescription:
       'Turquoise water, white sand, and palm trees — a bright, easy-to-sort tropical beach jigsaw puzzle, free to play online.',
   },
+  {
+    id: 'starry-night',
+    title: 'The Starry Night',
+    src: '/images/art-starry-night.jpg',
+    credit: 'Vincent van Gogh, public domain via Wikimedia Commons',
+    categories: ['art', 'hard'],
+    seoDescription:
+      'Piece together Van Gogh’s The Starry Night — a free classic-art jigsaw puzzle of swirling sky and glowing stars, playable online in your browser.',
+  },
+  {
+    id: 'pearl-earring',
+    title: 'Girl with a Pearl Earring',
+    src: '/images/art-pearl-earring.jpg',
+    credit: 'Johannes Vermeer, public domain via Wikimedia Commons',
+    categories: ['art', 'kids-easy'],
+    seoDescription:
+      'Vermeer’s Girl with a Pearl Earring as a free online jigsaw puzzle. A famous portrait with a simple dark background — great for a focused solve.',
+  },
+  {
+    id: 'great-wave',
+    title: 'The Great Wave',
+    src: '/images/art-great-wave.jpg',
+    credit: 'Katsushika Hokusai, public domain via Wikimedia Commons',
+    categories: ['art', 'kids-easy'],
+    seoDescription:
+      'Hokusai’s Great Wave off Kanagawa as a free art jigsaw puzzle. Bold blues and foam make this Japanese woodblock print satisfying to piece together.',
+  },
+  {
+    id: 'sunflowers',
+    title: 'Sunflowers',
+    src: '/images/art-sunflowers.jpg',
+    credit: 'Vincent van Gogh, public domain via Wikimedia Commons',
+    categories: ['art', 'kids-easy'],
+    seoDescription:
+      'Van Gogh’s Sunflowers jigsaw puzzle, free to play online. Warm yellows and a clear vase make this a bright, friendly classic-art puzzle.',
+  },
+  {
+    id: 'water-lilies',
+    title: 'Water Lilies',
+    src: '/images/art-water-lilies.jpg',
+    credit: 'Claude Monet, public domain via Wikimedia Commons',
+    categories: ['art', 'hard'],
+    seoDescription:
+      'Monet’s Water Lilies as a free impressionist jigsaw puzzle. Soft color and reflected light make this a beautifully tricky painting to reassemble.',
+  },
+  {
+    id: 'klimt-kiss',
+    title: 'The Kiss',
+    src: '/images/art-klimt-kiss.jpg',
+    credit: 'Gustav Klimt, public domain via Wikimedia Commons',
+    categories: ['art', 'hard'],
+    seoDescription:
+      'Klimt’s The Kiss as a free online jigsaw puzzle. Gold pattern and rich detail make this Art Nouveau painting a lush, challenging solve.',
+  },
+  {
+    id: 'birth-of-venus',
+    title: 'The Birth of Venus',
+    src: '/images/art-birth-of-venus.jpg',
+    credit: 'Sandro Botticelli, public domain via Wikimedia Commons',
+    categories: ['art'],
+    seoDescription:
+      'Botticelli’s Birth of Venus as a free Renaissance jigsaw puzzle. Soft seas, flowing hair, and a famous pose — play online, no download needed.',
+  },
+  {
+    id: 'la-grande-jatte',
+    title: 'A Sunday on La Grande Jatte',
+    src: '/images/art-grande-jatte.jpg',
+    credit: 'Georges Seurat, public domain via Wikimedia Commons',
+    categories: ['art', 'hard'],
+    seoDescription:
+      'Seurat’s A Sunday on La Grande Jatte as a free pointillist jigsaw puzzle. Crowds, shade, and tiny dots of color make this a rich challenge.',
+  },
 ];

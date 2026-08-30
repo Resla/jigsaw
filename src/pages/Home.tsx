@@ -56,7 +56,7 @@ export function Home() {
   useSeo({
     title: `${SITE_NAME} — Free Online Jigsaw Puzzles`,
     description:
-      'Play free online jigsaw puzzles in your browser — animals, nature, and easy or hard piece counts. No download, no sign-up, works offline as a PWA.',
+      'Play free online jigsaw puzzles in your browser — animals, nature, classic art, and easy or hard piece counts. No download, no sign-up, works offline as a PWA.',
     path: '/',
     jsonLd: {
       '@context': 'https://schema.org',

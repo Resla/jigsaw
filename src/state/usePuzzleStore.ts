@@ -11,6 +11,7 @@ import {
 import { generatePuzzle } from '../engine/generatePuzzle';
 import { hashSeed } from '../engine/random';
 import { playRotateClick, playSnap, playSolveFanfare } from '../engine/sfx';
+import { scatterBesideBoard } from '../engine/tableLayout';
 
 const DEFAULT_HINTS = 5;
 
@@ -66,16 +67,7 @@ function scatterPositions(
   tableHeight: number,
   rotationEnabled: boolean,
 ): Record<number, Position> {
-  const positions: Record<number, Position> = {};
-  const rng = () => Math.random();
-  for (const piece of pieces) {
-    positions[piece.id] = {
-      x: rng() * Math.max(1, tableWidth - piece.cellWidth),
-      y: rng() * Math.max(1, tableHeight - piece.cellHeight),
-      rotation: rotationEnabled ? Math.floor(rng() * 4) : 0,
-    };
-  }
-  return positions;
+  return scatterBesideBoard(pieces, tableWidth, tableHeight, rotationEnabled);
 }
 
 /** Fills in a default rotation for legacy saves, and forces everything upright when rotation is off. */

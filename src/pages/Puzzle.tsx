@@ -14,9 +14,7 @@ import { buildRaceShareText, buildRaceUrl, parseRaceChallenge } from '../engine/
 import { useSeo } from '../hooks/useSeo';
 import { getCategory } from '../data/categories';
 import { SITE_URL } from '../data/siteConfig';
-
-const TABLE_MARGIN = 60;
-const TABLE_SCALE = 1.35;
+import { computeGuide, computeTableSize } from '../engine/tableLayout';
 
 export function Puzzle() {
   const { imageId, customId } = useParams<{ imageId?: string; customId?: string }>();
@@ -114,8 +112,10 @@ export function Puzzle() {
     if (!image || !source || !puzzleId) return;
     const aspectRatio = image.naturalWidth / image.naturalHeight;
     const { rows, cols } = computeGridSize(pieceCount, aspectRatio);
-    const tableWidthCalc = Math.max(image.naturalWidth * TABLE_SCALE, image.naturalWidth + 260);
-    const tableHeightCalc = Math.max(image.naturalHeight * TABLE_SCALE, image.naturalHeight + 260);
+    const { tableWidth: tableWidthCalc, tableHeight: tableHeightCalc } = computeTableSize(
+      image.naturalWidth,
+      image.naturalHeight,
+    );
 
     loadPuzzle({
       imageId: puzzleId,
@@ -223,14 +223,43 @@ export function Puzzle() {
   }
 
   const guide = image
-    ? { x: TABLE_MARGIN, y: TABLE_MARGIN, width: image.naturalWidth, height: image.naturalHeight }
+    ? computeGuide(image.naturalWidth, image.naturalHeight, tableWidth, tableHeight)
     : { x: 0, y: 0, width: 0, height: 0 };
+
+  const renderActionButtons = () => (
+    <>
+      <button
+        type="button"
+        className="hint-button"
+        onClick={useHint}
+        disabled={hintsRemaining <= 0 || solved}
+        title="Highlight a piece and its correct spot"
+      >
+        <span className="hint-label-full">💡 Hint ({hintsRemaining})</span>
+        <span className="hint-label-short">💡 {hintsRemaining}</span>
+      </button>
+      <button
+        type="button"
+        className="mute-button"
+        onClick={toggleMuted}
+        aria-label={muted ? 'Unmute sound' : 'Mute sound'}
+      >
+        {muted ? '🔇' : '🔊'}
+      </button>
+      <button type="button" className="reset-button" onClick={reset}>
+        Reset
+      </button>
+    </>
+  );
 
   return (
     <div className="puzzle-page">
       <header className="puzzle-header">
-        <Link to="/" className="back-link">
-          ← Gallery
+        <Link to="/" className="back-link" aria-label="Back to gallery">
+          <span className="back-link-full">← Gallery</span>
+          <span className="back-link-short" aria-hidden="true">
+            ←
+          </span>
         </Link>
         <div className="puzzle-title-block">
           <h2>
@@ -250,39 +279,18 @@ export function Puzzle() {
               <span className="stat-label">Moves</span>
               <span className="stat-value">{moves}</span>
             </div>
-            <div className="stat">
+            <div className="stat stat-pieces">
               <span className="stat-label">Pieces</span>
               <span className="stat-value">{pieces.length}</span>
             </div>
             {bestTime && (
-              <div className="stat">
+              <div className="stat stat-best">
                 <span className="stat-label">Best</span>
                 <span className="stat-value">{formatDuration(bestTime.timeMs)}</span>
               </div>
             )}
           </div>
-          <div className="puzzle-header-actions">
-            <button
-              type="button"
-              className="hint-button"
-              onClick={useHint}
-              disabled={hintsRemaining <= 0 || solved}
-              title="Highlight a piece and its correct spot"
-            >
-              💡 Hint ({hintsRemaining})
-            </button>
-            <button
-              type="button"
-              className="mute-button"
-              onClick={toggleMuted}
-              aria-label={muted ? 'Unmute sound' : 'Mute sound'}
-            >
-              {muted ? '🔇' : '🔊'}
-            </button>
-            <button type="button" className="reset-button" onClick={reset}>
-              Reset
-            </button>
-          </div>
+          <div className="puzzle-header-actions">{renderActionButtons()}</div>
         </div>
       </header>
 
@@ -306,6 +314,10 @@ export function Puzzle() {
           </div>
         )}
       </div>
+
+      <nav className="puzzle-mobile-toolbar" aria-label="Puzzle actions">
+        {renderActionButtons()}
+      </nav>
 
       {solved && (
         <div className="solved-overlay">

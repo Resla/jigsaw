@@ -38,6 +38,14 @@ interface View {
 const MIN_SCALE = 0.12;
 const MAX_SCALE = 3;
 const FIT_PADDING = 32;
+const PINCH_MIN_DISTANCE = 8;
+const LARGE_RESIZE_RATIO = 0.2;
+const COARSE_ZOOM_STEP = 1.4;
+const FINE_ZOOM_STEP = 1.25;
+
+function pointerDistance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -93,9 +101,33 @@ export function PuzzleBoard({
   const [view, setView] = useState<View>({ scale: 1, x: 0, y: 0 });
   const viewRef = useRef(view);
   const [isPanning, setIsPanning] = useState(false);
+  const userAdjustedViewRef = useRef(false);
+  const pointersRef = useRef(new Map<number, { x: number; y: number }>());
+  const pinchRef = useRef<{
+    startDistance: number;
+    startScale: number;
+    startX: number;
+    startY: number;
+    startMidX: number;
+    startMidY: number;
+  } | null>(null);
+  const pieceByIdRef = useRef(pieceById);
+  pieceByIdRef.current = pieceById;
   useEffect(() => {
     viewRef.current = view;
   }, [view]);
+
+  const markUserAdjusted = useCallback(() => {
+    userAdjustedViewRef.current = true;
+  }, []);
+
+  const zoomStep = useMemo(
+    () =>
+      typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+        ? COARSE_ZOOM_STEP
+        : FINE_ZOOM_STEP,
+    [],
+  );
 
   const fitToScreen = useCallback(() => {
     const viewport = viewportRef.current;
@@ -110,10 +142,64 @@ export function PuzzleBoard({
     setView({ scale, x, y });
   }, [tableWidth, tableHeight]);
 
-  useEffect(() => {
+  const handleFitToScreen = useCallback(() => {
+    userAdjustedViewRef.current = false;
     fitToScreen();
-    window.addEventListener('resize', fitToScreen);
-    return () => window.removeEventListener('resize', fitToScreen);
+  }, [fitToScreen]);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    let didInitialFit = false;
+    let lastW = 0;
+    let lastH = 0;
+
+    const maybeFit = (force: boolean) => {
+      const w = viewport.clientWidth;
+      const h = viewport.clientHeight;
+      if (w === 0 || h === 0) return;
+
+      const grewFromZero = lastW === 0 || lastH === 0;
+      const largeChange =
+        lastW > 0 &&
+        lastH > 0 &&
+        (Math.abs(w - lastW) / lastW > LARGE_RESIZE_RATIO || Math.abs(h - lastH) / lastH > LARGE_RESIZE_RATIO);
+      lastW = w;
+      lastH = h;
+
+      if (!didInitialFit || grewFromZero) {
+        didInitialFit = true;
+        userAdjustedViewRef.current = false;
+        fitToScreen();
+        return;
+      }
+
+      if (force || largeChange) {
+        userAdjustedViewRef.current = false;
+        fitToScreen();
+        return;
+      }
+
+      // URL-bar / visual-viewport jitter: keep a fitted board until the user zooms or pans.
+      if (!userAdjustedViewRef.current) fitToScreen();
+    };
+
+    maybeFit(false);
+
+    const observer = new ResizeObserver(() => maybeFit(false));
+    observer.observe(viewport);
+
+    const forceFit = () => maybeFit(true);
+    window.addEventListener('orientationchange', forceFit);
+    const orientation = window.screen?.orientation;
+    orientation?.addEventListener?.('change', forceFit);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('orientationchange', forceFit);
+      orientation?.removeEventListener?.('change', forceFit);
+    };
   }, [fitToScreen]);
 
   // Non-passive wheel listener so we can preventDefault (React's onWheel is passive by default).
@@ -131,10 +217,108 @@ export function PuzzleBoard({
       const ratio = nextScale / prev.scale;
       const nextX = cursorX - (cursorX - prev.x) * ratio;
       const nextY = cursorY - (cursorY - prev.y) * ratio;
+      userAdjustedViewRef.current = true;
       setView({ scale: nextScale, x: nextX, y: nextY });
     };
     viewport.addEventListener('wheel', handleWheel, { passive: false });
     return () => viewport.removeEventListener('wheel', handleWheel);
+  }, []);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const restoreDraggedPieces = () => {
+      const drag = dragRef.current;
+      if (!drag) return;
+      const byId = pieceByIdRef.current;
+      for (const id of drag.memberIds) {
+        const orig = drag.originalPositions.get(id);
+        const piece = byId.get(id);
+        const el = elementRefs.current.get(id);
+        if (orig && piece && el) {
+          el.style.transform = `translate3d(${orig.x + piece.bbox.x}px, ${orig.y + piece.bbox.y}px, 0) rotate(${orig.rotation * 90}deg)`;
+        }
+      }
+      dragRef.current = null;
+      setLiftedIds(new Set());
+      setLockingIds(new Set());
+    };
+
+    const beginPinch = () => {
+      const pts = [...pointersRef.current.values()];
+      if (pts.length < 2) return;
+      const dist = pointerDistance(pts[0], pts[1]);
+      if (dist < PINCH_MIN_DISTANCE) return;
+      const rect = viewport.getBoundingClientRect();
+      const midX = (pts[0].x + pts[1].x) / 2 - rect.left;
+      const midY = (pts[0].y + pts[1].y) / 2 - rect.top;
+      const prev = viewRef.current;
+      pinchRef.current = {
+        startDistance: dist,
+        startScale: prev.scale,
+        startX: prev.x,
+        startY: prev.y,
+        startMidX: midX,
+        startMidY: midY,
+      };
+      userAdjustedViewRef.current = true;
+    };
+
+    const cancelOneFingerGestures = () => {
+      panRef.current = null;
+      setIsPanning(false);
+      restoreDraggedPieces();
+    };
+
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('.board-toolbar')) return;
+      pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointersRef.current.size >= 2) {
+        cancelOneFingerGestures();
+        beginPinch();
+      }
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!pointersRef.current.has(e.pointerId)) return;
+      pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointersRef.current.size < 2) return;
+      if (!pinchRef.current) beginPinch();
+      const pinch = pinchRef.current;
+      if (!pinch) return;
+      const pts = [...pointersRef.current.values()];
+      const dist = pointerDistance(pts[0], pts[1]);
+      if (dist < PINCH_MIN_DISTANCE) return;
+      const rect = viewport.getBoundingClientRect();
+      const midX = (pts[0].x + pts[1].x) / 2 - rect.left;
+      const midY = (pts[0].y + pts[1].y) / 2 - rect.top;
+      const nextScale = clamp(pinch.startScale * (dist / pinch.startDistance), MIN_SCALE, MAX_SCALE);
+      const ratio = nextScale / pinch.startScale;
+      setView({
+        scale: nextScale,
+        x: midX - (pinch.startMidX - pinch.startX) * ratio,
+        y: midY - (pinch.startMidY - pinch.startY) * ratio,
+      });
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      pointersRef.current.delete(e.pointerId);
+      if (pointersRef.current.size < 2) pinchRef.current = null;
+    };
+
+    viewport.addEventListener('pointerdown', onPointerDown, { capture: true });
+    // Move/up on window so a pinch continues if a finger slides off the board.
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+    return () => {
+      viewport.removeEventListener('pointerdown', onPointerDown, { capture: true });
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+    };
   }, []);
 
   const zoomBy = useCallback((factor: number) => {
@@ -142,6 +326,7 @@ export function PuzzleBoard({
     if (!viewport) return;
     const cursorX = viewport.clientWidth / 2;
     const cursorY = viewport.clientHeight / 2;
+    markUserAdjusted();
     setView((prev) => {
       const nextScale = clamp(prev.scale * factor, MIN_SCALE, MAX_SCALE);
       const ratio = nextScale / prev.scale;
@@ -151,7 +336,7 @@ export function PuzzleBoard({
         y: cursorY - (cursorY - prev.y) * ratio,
       };
     });
-  }, []);
+  }, [markUserAdjusted]);
 
   const registerRef = useCallback((pieceId: number, el: HTMLDivElement | null) => {
     if (el) elementRefs.current.set(pieceId, el);
@@ -160,14 +345,17 @@ export function PuzzleBoard({
 
   const handleViewportPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     // Pieces call stopPropagation on their own pointerdown, so reaching here means empty background.
+    if (pointersRef.current.size >= 2 || pinchRef.current) return;
+    if ((e.target as HTMLElement).closest('.board-toolbar')) return;
     const startX = viewRef.current.x;
     const startY = viewRef.current.y;
     panRef.current = { startClientX: e.clientX, startClientY: e.clientY, startX, startY };
     setIsPanning(true);
+    markUserAdjusted();
 
     const handleMove = (ev: PointerEvent) => {
       const pan = panRef.current;
-      if (!pan) return;
+      if (!pan || pinchRef.current) return;
       setView((prev) => ({
         ...prev,
         x: pan.startX + (ev.clientX - pan.startClientX),
@@ -182,13 +370,14 @@ export function PuzzleBoard({
     };
     window.addEventListener('pointermove', handleMove);
     window.addEventListener('pointerup', handleUp);
-  }, []);
+  }, [markUserAdjusted]);
 
   const handlePiecePointerDown = useCallback(
     (pieceId: number, e: React.PointerEvent<HTMLDivElement>) => {
       // Right-click is handled exclusively by onContextMenu (rotate the other way); if we let it
       // also fall through to the tap-to-rotate logic below, the two rotations would cancel out.
       if (e.button === 2) return;
+      if (pointersRef.current.size >= 2 || pinchRef.current) return;
       e.preventDefault();
       e.stopPropagation();
       const memberIds = groupMembersOf(pieceId);
@@ -256,7 +445,7 @@ export function PuzzleBoard({
 
       const handleMove = (ev: PointerEvent) => {
         const drag = dragRef.current;
-        if (!drag) return;
+        if (!drag || pinchRef.current || pointersRef.current.size >= 2) return;
         const rawDx = (ev.clientX - drag.startClientX) / drag.scale;
         const rawDy = (ev.clientY - drag.startClientY) / drag.scale;
         const pulled = pulledDelta(rawDx, rawDy);
@@ -390,16 +579,21 @@ export function PuzzleBoard({
         })}
       </div>
 
-      <div className="board-toolbar">
-        <button type="button" onClick={() => zoomBy(1 / 1.25)} aria-label="Zoom out">
+      <div
+        className="board-toolbar"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button type="button" onClick={() => zoomBy(1 / zoomStep)} aria-label="Zoom out">
           −
         </button>
         <span className="board-toolbar-divider" />
-        <button type="button" onClick={fitToScreen} aria-label="Fit to screen" className="zoom-fit">
-          ⤢ Fit
+        <button type="button" onClick={handleFitToScreen} aria-label="Fit to screen" className="zoom-fit">
+          <span className="zoom-fit-full">⤢ Fit</span>
+          <span className="zoom-fit-short">⤢</span>
         </button>
         <span className="board-toolbar-divider" />
-        <button type="button" onClick={() => zoomBy(1.25)} aria-label="Zoom in">
+        <button type="button" onClick={() => zoomBy(zoomStep)} aria-label="Zoom in">
           +
         </button>
       </div>

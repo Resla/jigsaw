@@ -1,4 +1,4 @@
-export type CategorySlug = 'animals' | 'nature' | 'kids-easy' | 'hard';
+export type CategorySlug = 'animals' | 'nature' | 'art' | 'kids-easy' | 'hard';
 
 export interface CategoryDef {
   slug: CategorySlug;
@@ -32,6 +32,17 @@ export const categories: CategoryDef[] = [
       'Free online nature and landscape jigsaw puzzles — mountains, fjords, forests, deserts, and beaches. Play instantly in your browser, no download needed.',
     intro:
       'Sweeping mountain ranges, quiet fjords, and sun-drenched beaches — these nature and landscape jigsaw puzzles are great for slowing down and losing an hour. Every puzzle is free to play right in your browser.',
+  },
+  {
+    slug: 'art',
+    name: 'Art & Paintings',
+    emoji: '🎨',
+    tagline: 'Classic paintings as jigsaws',
+    seoTitle: 'Art & Painting Jigsaw Puzzles — Play Free Online',
+    seoDescription:
+      'Free online art jigsaw puzzles — Van Gogh, Vermeer, Monet, Hokusai, and more classic paintings. Play instantly in your browser, no download needed.',
+    intro:
+      'Famous paintings make some of the most satisfying jigsaws: bold color, clear shapes, and a picture you already know. These art puzzles are free to play in your browser — pick a painting, choose a piece count, and start.',
   },
   {
     slug: 'kids-easy',
