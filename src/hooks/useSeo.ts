@@ -51,6 +51,7 @@ export function useSeo(options: SeoOptions): void {
   const { title, description, path, image, noindex, jsonLd } = options;
 
   useEffect(() => {
+    document.documentElement.dataset.seoPath = path ?? '';
     document.title = title;
     upsertMeta('name', 'description', description);
     upsertMeta('property', 'og:title', title);

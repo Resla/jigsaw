@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-label="Moon Pals">
+  <title>Moon Pals</title>
+  <desc>A night hill with a smiling moon, twinkling stars, a blinking owl, and a sleepy fox.</desc>
+  <style>
+    .star { transform-box: fill-box; transform-origin: center; animation: twinkle 2.4s ease-in-out infinite; }
+    .star.s2 { animation-delay: 0.4s; }
+    .star.s3 { animation-delay: 0.9s; }
+    .star.s4 { animation-delay: 1.3s; }
+    .moon { transform-origin: 140px 110px; animation: glow 4s ease-in-out infinite; }
+    .eye { transform-box: fill-box; transform-origin: center; animation: blink 5s ease-in-out infinite; }
+    .owl-wing { transform-box: fill-box; transform-origin: top center; animation: flap 2.2s ease-in-out infinite; }
+    .fox { animation: nod 3.4s ease-in-out infinite; }
+    .firefly { animation: zip 6s ease-in-out infinite; }
+    .firefly.f2 { animation-delay: -2s; }
+    .shoot { animation: streak 8s linear infinite; }
+    @keyframes twinkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.25; transform: scale(0.7); }
+    }
+    @keyframes glow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes blink {
+      0%, 36%, 40%, 100% { transform: scaleY(1); }
+      38% { transform: scaleY(0.08); }
+    }
+    @keyframes flap {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-12deg); }
+    }
+    @keyframes nod {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
+    }
+    @keyframes zip {
+      0% { transform: translate(0, 0); opacity: 0.2; }
+      40% { transform: translate(50px, -24px); opacity: 1; }
+      70% { transform: translate(10px, 16px); opacity: 0.6; }
+      100% { transform: translate(0, 0); opacity: 0.2; }
+    }
+    @keyframes streak {
+      0%, 70% { transform: translate(0, 0); opacity: 0; }
+      78% { opacity: 1; }
+      100% { transform: translate(160px, 70px); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .star, .moon, .eye, .owl-wing, .fox, .firefly, .shoot { animation: none; }
+    }
+  </style>
+  <defs>
+    <linearGradient id="moonSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1b1a4a"/>
+      <stop offset="70%" stop-color="#3d2b7a"/>
+      <stop offset="100%" stop-color="#6a4c9a"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff6c2"/>
+      <stop offset="80%" stop-color="#ffe36b"/>
+      <stop offset="100%" stop-color="#ffc53d"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#moonSky)"/>
+  <circle class="star" cx="260" cy="70" r="3.5" fill="#fff6c2"/>
+  <circle class="star s2" cx="340" cy="120" r="2.5" fill="#fff"/>
+  <circle class="star s3" cx="430" cy="60" r="3" fill="#fff6c2"/>
+  <circle class="star s4" cx="520" cy="100" r="2.4" fill="#fff"/>
+  <circle class="star" cx="610" cy="50" r="3" fill="#fff"/>
+  <circle class="star s2" cx="700" cy="90" r="2.6" fill="#fff6c2"/>
+  <circle class="star s3" cx="300" cy="180" r="2" fill="#fff"/>
+  <circle class="star s4" cx="760" cy="150" r="2.2" fill="#fff"/>
+  <path class="shoot" d="M480 80 l36 16" stroke="#fff6c2" stroke-width="3" stroke-linecap="round"/>
+  <g class="moon">
+    <circle cx="140" cy="110" r="52" fill="url(#moonGlow)"/>
+    <circle cx="158" cy="96" r="10" fill="#f0d36a" opacity="0.45"/>
+    <circle cx="118" cy="124" r="7" fill="#f0d36a" opacity="0.35"/>
+    <g class="eye">
+      <ellipse cx="122" cy="102" rx="5" ry="6" fill="#3a2a1a"/>
+      <ellipse cx="154" cy="102" rx="5" ry="6" fill="#3a2a1a"/>
+    </g>
+    <path d="M124 124c10 10 22 10 32 0" fill="none" stroke="#e36b2d" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="112" cy="118" r="6" fill="#ff9aa2" opacity="0.55"/>
+    <circle cx="168" cy="118" r="6" fill="#ff9aa2" opacity="0.55"/>
+  </g>
+  <path d="M-20 390 C 160 300, 320 330, 480 370 C 620 406, 720 340, 840 380 L 840 600 L -20 600 Z" fill="#2b2158"/>
+  <path d="M-40 460 C 180 390, 360 420, 540 450 C 660 472, 740 430, 860 460 L 860 600 L -40 600 Z" fill="#3d2b7a"/>
+  <rect x="560" y="300" width="16" height="90" rx="6" fill="#5a3a1c"/>
+  <circle cx="568" cy="292" r="36" fill="#2f2150"/>
+  <circle cx="546" cy="310" r="20" fill="#3d2b7a"/>
+  <circle cx="590" cy="312" r="18" fill="#24183f"/>
+  <g transform="translate(530 250)">
+    <ellipse cx="40" cy="58" rx="28" ry="24" fill="#c9a36a"/>
+    <circle cx="40" cy="40" r="20" fill="#d8b57a"/>
+    <polygon points="22,28 18,8 32,26" fill="#c9a36a"/>
+    <polygon points="48,26 62,8 58,28" fill="#c9a36a"/>
+    <g class="owl-wing"><ellipse cx="14" cy="56" rx="10" ry="16" fill="#b48a4a"/></g>
+    <ellipse cx="66" cy="56" rx="10" ry="16" fill="#b48a4a"/>
+    <g class="eye">
+      <circle cx="32" cy="38" r="6" fill="#fff6c2"/>
+      <circle cx="48" cy="38" r="6" fill="#fff6c2"/>
+      <circle cx="32" cy="38" r="3" fill="#2b2118"/>
+      <circle cx="48" cy="38" r="3" fill="#2b2118"/>
+    </g>
+    <path d="M40 46 l-5 6 h10 z" fill="#ff8a4c"/>
+  </g>
+  <g class="fox" transform="translate(220 400)">
+    <ellipse cx="70" cy="90" rx="40" ry="26" fill="#f4a261"/>
+    <ellipse class="tail" cx="16" cy="86" rx="18" ry="10" fill="#e76f51"/>
+    <circle cx="92" cy="70" r="22" fill="#f6b57a"/>
+    <polygon points="78,54 80,36 92,56" fill="#f4a261"/>
+    <polygon points="100,56 114,36 112,56" fill="#f4a261"/>
+    <ellipse cx="96" cy="78" rx="12" ry="8" fill="#ffe6b8"/>
+    <g class="eye">
+      <ellipse cx="86" cy="68" rx="3.2" ry="3.6" fill="#2b2118"/>
+      <ellipse cx="102" cy="68" rx="3.2" ry="3.6" fill="#2b2118"/>
+    </g>
+    <ellipse cx="94" cy="76" rx="5" ry="4" fill="#3a2a1a"/>
+    <path d="M86 84 q8 6 16 0" fill="none" stroke="#d35400" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <circle class="firefly" cx="380" cy="320" r="4" fill="#e8ff8a"/>
+  <circle class="firefly f2" cx="460" cy="360" r="3.5" fill="#e8ff8a"/>
+  <circle class="firefly" cx="640" cy="400" r="3" fill="#e8ff8a"/>
+</svg>

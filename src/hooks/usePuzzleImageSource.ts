@@ -8,8 +8,10 @@ export interface PuzzleImageSource {
   title: string;
   src: string;
   credit: string | null;
+  creditUrl?: string;
   seoDescription: string | null;
   categories: CategorySlug[];
+  animated?: boolean;
 }
 
 interface ResolvedImageState {
@@ -64,8 +66,10 @@ export function usePuzzleImageSource(imageId?: string, customId?: string): Resol
                 title: found.title,
                 src: found.src,
                 credit: found.credit,
+                creditUrl: found.creditUrl,
                 seoDescription: found.seoDescription,
                 categories: found.categories,
+                animated: found.animated,
               },
             }
           : { status: 'not-found', image: null },

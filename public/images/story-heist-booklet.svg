@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 220" width="840" height="220" role="img" aria-label="The official heist plan">
+  <title>THE PLAN  official briefing</title>
+  <rect width="840" height="220" fill="#f7efe2"/>
+  <rect x="12" y="12" width="816" height="196" rx="14" fill="#fffaf2" stroke="#c9a36a" stroke-width="3"/>
+  <text x="420" y="40" text-anchor="middle" font-size="18" font-family="Georgia, serif" fill="#6b3e1d" font-weight="700">THE PLAN (do not improvise)</text>
+  <g>
+    <rect x="32" y="56" width="240" height="132" rx="10" fill="#ffe8c2" stroke="#d9a066"/>
+    <text x="152" y="78" text-anchor="middle" font-size="12" fill="#8a4b1f">1. Briefing</text>
+    <circle cx="86" cy="120" r="18" fill="#c4c4c4"/>
+    <circle cx="152" cy="118" r="16" fill="#f0b15a"/>
+    <circle cx="210" cy="122" r="14" fill="#ff8a4c"/>
+    <rect x="54" y="148" width="160" height="22" rx="4" fill="#fff"/>
+    <text x="134" y="163" text-anchor="middle" font-size="10" fill="#4a3b2f">Quiet. Couch. Blueprint.</text>
+  </g>
+  <g>
+    <rect x="300" y="56" width="240" height="132" rx="10" fill="#d9f0ff" stroke="#7eb6d4"/>
+    <text x="420" y="78" text-anchor="middle" font-size="12" fill="#245a78">2. Approach</text>
+    <circle cx="360" cy="118" r="12" fill="#e8b86a"/>
+    <circle cx="420" cy="112" r="16" fill="#4db7ff"/>
+    <circle cx="488" cy="120" r="18" fill="#f0b15a"/>
+    <path d="M330 150 h180" stroke="#2f8a3e" stroke-width="3" stroke-dasharray="6 5"/>
+    <text x="420" y="172" text-anchor="middle" font-size="10" fill="#245a78">Hammy " Polly " Goldie stays</text>
+  </g>
+  <g>
+    <rect x="568" y="56" width="240" height="132" rx="10" fill="#e8ffd6" stroke="#7cbc68"/>
+    <text x="688" y="78" text-anchor="middle" font-size="12" fill="#2f5a32">3. The Vault</text>
+    <rect x="640" y="96" width="96" height="52" rx="8" fill="#e85d4c"/>
+    <text x="688" y="126" text-anchor="middle" font-size="11" fill="#fff">MEGA-BITES</text>
+    <text x="688" y="172" text-anchor="middle" font-size="10" fill="#2f5a32">Silent lock. Clean getaway.</text>
+  </g>
+</svg>

@@ -1,12 +1,18 @@
 import { useState } from 'react';
+import { LivingPicture } from './LivingPicture';
 
 interface ReferencePanelProps {
   src: string;
   title: string;
+  animated?: boolean;
 }
 
-export function ReferencePanel({ src, title }: ReferencePanelProps) {
-  const [open, setOpen] = useState(true);
+const MOBILE_MAX_WIDTH = 640;
+
+export function ReferencePanel({ src, title, animated }: ReferencePanelProps) {
+  const [open, setOpen] = useState(() =>
+    typeof window === 'undefined' ? true : window.innerWidth > MOBILE_MAX_WIDTH,
+  );
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -33,7 +39,11 @@ export function ReferencePanel({ src, title }: ReferencePanelProps) {
           onClick={() => setExpanded((e) => !e)}
           title={expanded ? 'Tap to shrink preview' : 'Tap to enlarge preview'}
         >
-          <img src={src} alt={`${title} — full preview`} draggable={false} />
+          {animated ? (
+            <LivingPicture src={src} title={`${title} — full preview`} />
+          ) : (
+            <img src={src} alt={`${title} — full preview`} draggable={false} />
+          )}
         </div>
       )}
     </div>

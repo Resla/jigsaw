@@ -4,6 +4,15 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8787',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({
@@ -27,6 +36,12 @@ export default defineConfig({
         // Gallery + user-uploaded images are data: URLs or same-origin static assets, so the
         // default precache of build assets plus a runtime cache for images covers offline play.
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
+        navigateFallbackDenylist: [
+          /^\/api\//,
+          /^\/robots\.txt$/i,
+          /^\/sitemap\.xml$/i,
+          /\/[^/?]+\.[^/]+$/,
+        ],
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.destination === 'image',

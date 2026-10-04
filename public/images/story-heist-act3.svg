@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-label="Act III pantry vault">
+  <title>The Vault</title>
+  <style>
+    .glow { animation: pulse 1.8s ease-in-out infinite; }
+    .lock { transform-box: fill-box; transform-origin: center; animation: jiggle 0.7s ease-in-out infinite; }
+    .shadow { animation: loom 3.2s ease-in-out infinite; }
+    .innocent { animation: sit 2.4s ease-in-out infinite; }
+    .foil { animation: shine 1.4s linear infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1;} 50% { opacity: 0.85;} }
+    @keyframes jiggle { 0%,100% { transform: rotate(-4deg);} 50% { transform: rotate(5deg);} }
+    @keyframes loom { 0%,100% { opacity: 0.35; transform: scaleY(1);} 50% { opacity: 0.7; transform: scaleY(1.06);} }
+    @keyframes sit { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-5px);} }
+    @keyframes shine { 0% { opacity: 0.3;} 50% { opacity: 1;} 100% { opacity: 0.3;} }
+    @media (prefers-reduced-motion: reduce) { .glow,.lock,.shadow,.innocent,.foil { animation: none; } }
+  </style>
+  <rect width="800" height="600" fill="#3d2b1f"/>
+  <rect x="70" y="40" width="660" height="520" rx="8" fill="#6b4632"/>
+  <rect x="90" y="60" width="200" height="70" rx="6" fill="#8a5a3a"/>
+  <rect x="310" y="60" width="200" height="70" rx="6" fill="#8a5a3a"/>
+  <rect x="530" y="60" width="180" height="70" rx="6" fill="#8a5a3a"/>
+  <rect x="90" y="150" width="200" height="90" rx="6" fill="#7a4e30"/>
+  <rect x="530" y="150" width="180" height="90" rx="6" fill="#7a4e30"/>
+  <g class="glow">
+    <rect x="300" y="200" width="200" height="130" rx="14" fill="#e85d4c"/>
+    <rect x="318" y="218" width="164" height="40" rx="8" fill="#ffe066"/>
+    <text x="400" y="246" text-anchor="middle" font-size="16" font-family="Georgia, serif" fill="#6b3e1d">MEGA-BITES</text>
+    <text x="400" y="300" text-anchor="middle" font-size="13" fill="#fff">SALMON - UNOPENED</text>
+    <rect class="foil" x="330" y="262" width="140" height="10" rx="3" fill="#f8f1c8"/>
+  </g>
+  <g class="lock">
+    <rect x="372" y="348" width="56" height="40" rx="8" fill="#c0c4c8"/>
+    <path d="M384 348 v-16 a16 16 0 0 1 32 0 v16" fill="none" stroke="#8a8f96" stroke-width="7"/>
+  </g>
+  <g class="innocent">
+    <ellipse cx="400" cy="430" rx="40" ry="22" fill="#c4c8cc"/>
+    <circle cx="400" cy="404" r="22" fill="#d0d4d8"/>
+    <circle cx="390" cy="400" r="3" fill="#2b2118"/>
+    <circle cx="412" cy="400" r="8" fill="none" stroke="#d4af37" stroke-width="2"/>
+    <ellipse cx="400" cy="448" rx="36" ry="10" fill="#e85d4c"/>
+  </g>
+  <ellipse cx="300" cy="450" rx="36" ry="20" fill="#f0b15a"/>
+  <circle cx="322" cy="434" r="16" fill="#f4c06a"/>
+  <ellipse cx="250" cy="470" rx="16" ry="12" fill="#e8b86a"/>
+  <ellipse cx="520" cy="444" rx="20" ry="14" fill="#ff8a4c"/>
+  <path d="M40 80 v440" stroke="#2b2118" stroke-width="70" opacity="0.15"/>
+  <g class="shadow">
+    <ellipse cx="80" cy="500" rx="50" ry="18" fill="#1a120c" opacity="0.55"/>
+    <rect x="54" y="220" width="52" height="280" rx="20" fill="#1a120c" opacity="0.45"/>
+    <circle cx="80" cy="200" r="28" fill="#1a120c" opacity="0.45"/>
+  </g>
+  <ellipse cx="620" cy="500" rx="24" ry="16" fill="#7ad7ff" opacity="0.4"/>
+  <ellipse cx="620" cy="498" rx="10" ry="6" fill="#ff8a4c"/>
+  <rect x="614" y="494" width="8" height="5" fill="#2b2118"/>
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-family="Georgia, serif" fill="#f3e2c7">The vault. Also the doorway.</text>
+  <text x="400" y="580" text-anchor="middle" font-size="13" fill="#f3e2c7">child-proof: defeated. adult-proof: pending.</text>
+</svg>

@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-label="Pond Pals">
+  <title>Pond Pals</title>
+  <desc>A pond with bobbing ducks, a blinking frog, jumping fish, and a darting dragonfly.</desc>
+  <style>
+    .pond-wave { animation: ripple 4s ease-in-out infinite; }
+    .pond-wave-b { animation: ripple 5s ease-in-out infinite reverse; }
+    .duck { transform-origin: 220px 360px; animation: bob 2.8s ease-in-out infinite; }
+    .duckling { transform-origin: 300px 380px; animation: bob 2.4s ease-in-out infinite 0.4s; }
+    .frog { transform-origin: 520px 390px; animation: hop 2.6s ease-in-out infinite; }
+    .eye { transform-box: fill-box; transform-origin: center; animation: blink 4.5s ease-in-out infinite; }
+    .fish { animation: leap 3.8s ease-in-out infinite; }
+    .dragonfly { animation: dart 7s linear infinite; }
+    .reed { transform-box: fill-box; transform-origin: bottom center; animation: sway 3s ease-in-out infinite; }
+    .reed.r2 { animation-delay: 0.5s; }
+    .lily { animation: spinsoft 10s linear infinite; transform-box: fill-box; transform-origin: center; }
+    .turtle { animation: peek 5s ease-in-out infinite; }
+    @keyframes ripple {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(18px); }
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-8px) rotate(3deg); }
+    }
+    @keyframes hop {
+      0%, 70%, 100% { transform: translateY(0); }
+      80% { transform: translateY(-16px); }
+    }
+    @keyframes blink {
+      0%, 40%, 44%, 100% { transform: scaleY(1); }
+      42% { transform: scaleY(0.08); }
+    }
+    @keyframes leap {
+      0%, 55%, 100% { transform: translate(0, 0) rotate(0); }
+      70% { transform: translate(28px, -42px) rotate(-20deg); }
+    }
+    @keyframes dart {
+      0% { transform: translate(0, 0); }
+      30% { transform: translate(90px, -20px); }
+      60% { transform: translate(40px, 18px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes sway {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(6deg); }
+    }
+    @keyframes spinsoft { to { transform: rotate(8deg); } }
+    @keyframes peek {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .pond-wave, .pond-wave-b, .duck, .duckling, .frog, .eye, .fish, .dragonfly, .reed, .lily, .turtle { animation: none; }
+    }
+  </style>
+  <defs>
+    <linearGradient id="pondSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9ee4ff"/>
+      <stop offset="100%" stop-color="#dff7ff"/>
+    </linearGradient>
+    <linearGradient id="pondWater" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4ec6d6"/>
+      <stop offset="100%" stop-color="#2a8fa8"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#pondSky)"/>
+  <circle cx="680" cy="90" r="42" fill="#ffe36b"/>
+  <g class="reed">
+    <rect x="70" y="250" width="8" height="140" rx="4" fill="#3d9a4a"/>
+    <ellipse cx="64" cy="248" rx="16" ry="8" fill="#4fb85a" transform="rotate(-30 64 248)"/>
+  </g>
+  <g class="reed r2">
+    <rect x="100" y="270" width="8" height="130" rx="4" fill="#2f8a3e"/>
+    <ellipse cx="112" cy="266" rx="16" ry="8" fill="#3d9a4a" transform="rotate(24 112 266)"/>
+  </g>
+  <g class="reed">
+    <rect x="710" y="260" width="8" height="140" rx="4" fill="#3d9a4a"/>
+    <ellipse cx="722" cy="256" rx="16" ry="8" fill="#4fb85a" transform="rotate(20 722 256)"/>
+  </g>
+  <rect x="0" y="360" width="800" height="240" fill="url(#pondWater)"/>
+  <path class="pond-wave" d="M-20 380 q40 -18 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0" fill="none" stroke="#b8f4ff" stroke-width="6" opacity="0.45"/>
+  <path class="pond-wave-b" d="M-40 420 q40 -14 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0" fill="none" stroke="#e8ffff" stroke-width="5" opacity="0.3"/>
+  <g class="lily">
+    <ellipse cx="430" cy="470" rx="38" ry="16" fill="#3fa24c"/>
+    <path d="M430 470 l28 -6 l-8 12 z" fill="#2f8a3e"/>
+  </g>
+  <ellipse cx="160" cy="500" rx="32" ry="13" fill="#4fb85a"/>
+  <ellipse cx="620" cy="510" rx="36" ry="14" fill="#3d9a4a"/>
+  <g class="duck">
+    <ellipse cx="220" cy="378" rx="40" ry="18" fill="#4ec6d6" opacity="0.35"/>
+    <ellipse cx="220" cy="360" rx="36" ry="22" fill="#ffe066"/>
+    <circle cx="248" cy="344" r="16" fill="#ffe066"/>
+    <path d="M260 346 l16 4 l-16 4 z" fill="#ff8a4c"/>
+    <g class="eye"><circle cx="252" cy="340" r="2.6" fill="#2b2118"/></g>
+    <ellipse cx="200" cy="356" rx="10" ry="6" fill="#fff3a8"/>
+  </g>
+  <g class="duckling">
+    <ellipse cx="300" cy="390" rx="20" ry="13" fill="#ffe066"/>
+    <circle cx="316" cy="380" r="10" fill="#ffe066"/>
+    <path d="M324 382 l9 2 l-9 2 z" fill="#ff8a4c"/>
+    <g class="eye"><circle cx="318" cy="378" r="1.8" fill="#2b2118"/></g>
+  </g>
+  <g class="frog">
+    <ellipse cx="520" cy="408" rx="28" ry="16" fill="#5ad16a"/>
+    <circle cx="500" cy="392" r="10" fill="#5ad16a"/>
+    <circle cx="536" cy="390" r="10" fill="#5ad16a"/>
+    <g class="eye">
+      <circle cx="500" cy="390" r="4" fill="#fff"/>
+      <circle cx="536" cy="388" r="4" fill="#fff"/>
+      <circle cx="501" cy="390" r="2.2" fill="#2b2118"/>
+      <circle cx="537" cy="388" r="2.2" fill="#2b2118"/>
+    </g>
+    <ellipse cx="520" cy="412" rx="10" ry="6" fill="#fff3a8"/>
+    <path d="M510 416 q10 6 20 0" fill="none" stroke="#2f8a3e" stroke-width="2"/>
+  </g>
+  <g class="fish">
+    <ellipse cx="390" cy="520" rx="22" ry="10" fill="#ff8ac5"/>
+    <path d="M368 520 l-14 -10 v20 z" fill="#ff6b9d"/>
+    <g class="eye"><circle cx="400" cy="518" r="2" fill="#2b2118"/></g>
+  </g>
+  <g class="turtle">
+    <ellipse cx="680" cy="470" rx="26" ry="14" fill="#6dcf6a"/>
+    <ellipse cx="680" cy="470" rx="18" ry="9" fill="#3d9a4a"/>
+    <circle cx="706" cy="468" r="8" fill="#8ee08a"/>
+    <g class="eye"><circle cx="710" cy="466" r="1.6" fill="#2b2118"/></g>
+  </g>
+  <g class="dragonfly">
+    <ellipse cx="250" cy="220" rx="16" ry="6" fill="#b8f4ff" opacity="0.8"/>
+    <ellipse cx="282" cy="220" rx="16" ry="6" fill="#d8fff4" opacity="0.8"/>
+    <rect x="260" y="214" width="14" height="12" rx="6" fill="#3a2a1a"/>
+  </g>
+</svg>

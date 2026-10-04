@@ -5,26 +5,38 @@ import { usePuzzleStore } from '../state/usePuzzleStore';
 import { PuzzleBoard } from '../components/PuzzleBoard';
 import { Timer } from '../components/Timer';
 import { ReferencePanel } from '../components/ReferencePanel';
+import { LivingPicture } from '../components/LivingPicture';
 import { usePuzzleImageSource } from '../hooks/usePuzzleImageSource';
 import { formatDuration, getBestTime, saveBestTimeIfBetter } from '../engine/bestTimes';
 import { buildShareText, getDailyChallengeInfo, recordDailyCompletion, shareOrCopy } from '../engine/dailyChallenge';
 import { isMuted, setMuted } from '../engine/sfx';
 import { recordPuzzleVisit } from '../engine/puzzleHistory';
 import { buildRaceShareText, buildRaceUrl, parseRaceChallenge } from '../engine/race';
+import { playerList, type PuzzleRoomState } from '../engine/roomClient';
+import { usePuzzleRoom } from '../hooks/usePuzzleRoom';
 import { useSeo } from '../hooks/useSeo';
 import { getCategory } from '../data/categories';
+import { galleryImages } from '../data/gallery';
 import { SITE_URL } from '../data/siteConfig';
 import { computeGuide, computeTableSize } from '../engine/tableLayout';
+import { getStoredPieceCount, MAX_PIECES, MIN_PIECES } from '../engine/playPrefs';
 
 export function Puzzle() {
   const { imageId, customId } = useParams<{ imageId?: string; customId?: string }>();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const dailyDate = searchParams.get('daily');
-  const dailyInfo = dailyDate ? getDailyChallengeInfo(dailyDate) : null;
-  const pieceCount = dailyInfo ? dailyInfo.pieceCount : Number(searchParams.get('pieces') ?? 48);
-  const rotationEnabled = !dailyInfo && searchParams.get('rotate') === '1';
-  const raceChallenge = !dailyInfo && !customId ? parseRaceChallenge(searchParams) : null;
+  const roomCode = searchParams.get('room');
+  const dailyInfo = dailyDate && !roomCode ? getDailyChallengeInfo(dailyDate) : null;
+  const requestedPieces = Number(searchParams.get('pieces'));
+  const pieceCount = dailyInfo
+    ? dailyInfo.pieceCount
+    : Number.isFinite(requestedPieces) && requestedPieces >= MIN_PIECES && requestedPieces <= MAX_PIECES
+      ? requestedPieces
+      : getStoredPieceCount();
+  const rotationEnabled = !dailyInfo && !roomCode && searchParams.get('rotate') === '1';
+  const raceChallenge = !dailyInfo && !customId && !roomCode ? parseRaceChallenge(searchParams) : null;
+  const { room, send } = usePuzzleRoom(roomCode);
   const [muted, setMutedState] = useState(isMuted);
   const [raceStatus, setRaceStatus] = useState<'idle' | 'copied' | 'shared' | 'failed'>('idle');
 
@@ -50,14 +62,20 @@ export function Puzzle() {
   const tableHeight = usePuzzleStore((s) => s.tableHeight);
   const rows = usePuzzleStore((s) => s.rows);
   const cols = usePuzzleStore((s) => s.cols);
+  const getProgress = usePuzzleStore((s) => s.getProgress);
 
-  const puzzleId = dailyInfo ? dailyInfo.puzzleId : source?.id ?? null;
+  const puzzleId = roomCode
+    ? `room-${roomCode}-${source?.id ?? imageId}`
+    : dailyInfo
+      ? dailyInfo.puzzleId
+      : source?.id ?? null;
 
   const breadcrumbCategory = source && source.categories.length > 0 ? getCategory(source.categories[0]) : undefined;
   useSeo({
-    title: source ? `${source.title} Jigsaw Puzzle — Play Free Online | Jigsaw` : 'Jigsaw Puzzle | Jigsaw',
-    description:
-      source?.seoDescription ?? 'Play a free jigsaw puzzle online in your browser — no download or sign-up required.',
+    title: source
+      ? `${source.title} Jigsaw Puzzle — Play Free Online | Jigsaw`
+      : 'Jigsaw Puzzle | Jigsaw',
+    description: source?.seoDescription ?? 'Play a free jigsaw puzzle online in your browser — no download or sign-up required.',
     path: !customId && source ? `/puzzle/${source.id}` : undefined,
     image: !customId ? source?.src : undefined,
     noindex: Boolean(customId),
@@ -93,6 +111,19 @@ export function Puzzle() {
               contentUrl: `${SITE_URL}${source.src}`,
               name: source.title,
               description: source.seoDescription ?? undefined,
+              creditText: source.credit ?? undefined,
+            },
+            {
+              '@context': 'https://schema.org',
+              '@type': 'Game',
+              name: `${source.title} Jigsaw Puzzle`,
+              description: source.seoDescription,
+              url: `${SITE_URL}/puzzle/${source.id}`,
+              image: `${SITE_URL}${source.src}`,
+              genre: 'Jigsaw puzzle',
+              gamePlatform: 'Web browser',
+              isAccessibleForFree: true,
+              offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
             },
           ]
         : undefined,
@@ -176,6 +207,20 @@ export function Puzzle() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solved, puzzleId, rows, cols, startedAt, moves]);
 
+  useEffect(() => {
+    if (!roomCode || pieces.length === 0) return;
+    const timer = window.setTimeout(() => {
+      send({
+        type: 'progress',
+        percent: getProgress(),
+        moves,
+        solved,
+        timeMs: Date.now() - startedAt,
+      });
+    }, solved ? 0 : 400);
+    return () => window.clearTimeout(timer);
+  }, [roomCode, pieces.length, moves, solved, startedAt, getProgress, send]);
+
   const toggleMuted = () => {
     setMuted(!muted);
     setMutedState(!muted);
@@ -255,19 +300,70 @@ export function Puzzle() {
   return (
     <div className="puzzle-page">
       <header className="puzzle-header">
-        <Link to="/" className="back-link" aria-label="Back to gallery">
-          <span className="back-link-full">← Gallery</span>
+        <Link to={roomCode ? `/play/${roomCode}` : '/'} className="back-link" aria-label={roomCode ? 'Back to room' : 'Back to gallery'}>
+          <span className="back-link-full">{roomCode ? '← Room' : '← Gallery'}</span>
           <span className="back-link-short" aria-hidden="true">
             ←
           </span>
         </Link>
         <div className="puzzle-title-block">
-          <h2>
+          <h1>
             {dailyInfo && <span className="daily-badge">Daily #{dailyInfo.dayNumber}</span>}
+            {roomCode && <span className="race-badge">🏁 Room {roomCode}</span>}
             {raceChallenge && <span className="race-badge">🏁 Beat {formatDuration(raceChallenge.timeMs)}</span>}
             {source?.title ?? 'Loading…'}
-          </h2>
+          </h1>
           {source?.seoDescription && <p className="puzzle-subtitle">{source.seoDescription}</p>}
+          {source && !customId && (
+            <p className="puzzle-seo-meta">
+              Free online jigsaw
+              {breadcrumbCategory && (
+                <>
+                  {' · '}
+                  <Link to={`/category/${breadcrumbCategory.slug}`}>{breadcrumbCategory.name}</Link>
+                </>
+              )}
+              {' · '}
+              24 to 500 pieces
+              {source.credit && (
+                <>
+                  {' · '}
+                  {source.creditUrl ? (
+                    <a href={source.creditUrl} target="_blank" rel="noopener noreferrer">
+                      {source.credit}
+                    </a>
+                  ) : (
+                    source.credit
+                  )}
+                </>
+              )}
+            </p>
+          )}
+          {source && !customId && !roomCode && (
+            <nav className="puzzle-related" aria-label="More puzzles">
+              More puzzles
+              {breadcrumbCategory && (
+                <>
+                  {' in '}
+                  <Link to={`/category/${breadcrumbCategory.slug}`}>{breadcrumbCategory.name}</Link>
+                  {': '}
+                </>
+              )}
+              {galleryImages
+                .filter(
+                  (image) =>
+                    image.id !== source.id &&
+                    (!breadcrumbCategory || image.categories.includes(breadcrumbCategory.slug)),
+                )
+                .slice(0, 5)
+                .map((image, index, list) => (
+                  <span key={image.id}>
+                    <Link to={`/puzzle/${image.id}`}>{image.title}</Link>
+                    {index < list.length - 1 ? ' · ' : ''}
+                  </span>
+                ))}
+            </nav>
+          )}
         </div>
         <div className="puzzle-stats">
           <div className="puzzle-scoreboard">
@@ -305,7 +401,8 @@ export function Puzzle() {
               guide={guide}
               rotationEnabled={rotationEnabled}
             />
-            <ReferencePanel src={source.src} title={source.title} />
+            <ReferencePanel src={source.src} title={source.title} animated={source.animated} />
+            {room && <RoomScoreboard room={room} />}
           </>
         ) : (
           <div className="puzzle-loading">
@@ -321,8 +418,11 @@ export function Puzzle() {
 
       {solved && (
         <div className="solved-overlay">
-          <div className="solved-card">
-            <h2>🎉 Solved!</h2>
+          <div className={`solved-card${source?.animated ? ' solved-card-living' : ''}`}>
+            {source?.animated && (
+              <LivingPicture src={source.src} title={source.title} className="solved-living-art" />
+            )}
+            <h2>{source?.animated ? 'It woke up!' : '🎉 Solved!'}</h2>
             {isNewBest && <p className="new-best-badge">🏆 New personal best!</p>}
             <p>
               You finished <strong>{dailyInfo ? `Daily #${dailyInfo.dayNumber}` : source?.title}</strong> in{' '}
@@ -338,6 +438,19 @@ export function Puzzle() {
             )}
             {dailyInfo && dailyStreak !== null && (
               <p className="streak-line">🔥 {dailyStreak}-day streak</p>
+            )}
+            {room && (
+              <ul className="room-results">
+                {playerList(room).map((player, index) => (
+                  <li key={player.id}>
+                    {index === 0 && player.solved ? '🏆 ' : ''}
+                    {player.name}
+                    {player.solved && player.timeMs
+                      ? ` · ${formatDuration(player.timeMs)}`
+                      : ` · ${player.percent}%`}
+                  </li>
+                ))}
+              </ul>
             )}
             {raceOutcome && (
               <p className={`race-outcome-line ${raceOutcome.won ? 'won' : 'lost'}`}>
@@ -356,18 +469,34 @@ export function Puzzle() {
                   <button type="button" onClick={reset}>
                     Play Again
                   </button>
-                  {!customId && (
+                  {!customId && !roomCode && (
                     <button type="button" className="race-button" onClick={handleRaceChallenge}>
                       {raceStatus === 'copied' ? 'Link Copied!' : raceStatus === 'shared' ? 'Sent!' : '🏁 Challenge a Friend'}
                     </button>
                   )}
                 </>
               )}
-              <Link to="/">Choose New Puzzle</Link>
+              <Link to={roomCode ? `/play/${roomCode}` : '/'}>{roomCode ? 'Back to room' : 'Choose New Puzzle'}</Link>
             </div>
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+function RoomScoreboard({ room }: { room: PuzzleRoomState }) {
+  return (
+    <aside className="room-scoreboard" aria-label="Room race">
+      <strong>Room {room.code}</strong>
+      <ol>
+        {playerList(room).map((player) => (
+          <li key={player.id}>
+            <span>{player.name}</span>
+            <em>{player.solved ? 'Done' : `${player.percent}%`}</em>
+          </li>
+        ))}
+      </ol>
+    </aside>
   );
 }

@@ -18,6 +18,8 @@ dev-dist
 scripts/_fetch_batch.mjs
 scripts/_batch_specs.mjs
 scripts/_batch_results.json
+scripts/_verify_credits.mjs
+scripts/_credits*.json
 
 
 # Editor directories and files

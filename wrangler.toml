@@ -1,6 +1,25 @@
 name = "jigsaw"
+main = "worker/index.js"
 compatibility_date = "2026-08-23"
+workers_dev = true
+
+[[routes]]
+pattern = "puzzleharbour.com"
+custom_domain = true
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
+# Map /category/animals → dist/category/animals/index.html (prerender snapshots).
+# "none" + SPA fallback was serving the homepage shell for every pretty URL.
+html_handling = "drop-trailing-slash"
 not_found_handling = "single-page-application"
+run_worker_first = true
+
+[durable_objects]
+bindings = [{ name = "ROOMS", class_name = "PuzzleRoom" }]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["PuzzleRoom"]
+

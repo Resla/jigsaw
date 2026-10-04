@@ -13,6 +13,9 @@ export function SiteHeader() {
         <span className="site-logo-text">Jigsaw</span>
       </Link>
       <nav className="site-nav" aria-label="Main">
+        <Link to="/play">Play together</Link>
+        <Link to="/stories">Story Puzzles</Link>
+        <Link to="/spot-it">Spot it</Link>
         <a href="/#feedback">Feedback</a>
         <Link to="/my-puzzles">My Puzzles</Link>
       </nav>

@@ -57,6 +57,7 @@ interface PuzzleStoreState {
   useHint: () => void;
   clearHint: () => void;
   reset: () => void;
+  getProgress: () => number;
   groupIdOf: (pieceId: number) => number;
   groupMembersOf: (pieceId: number) => number[];
 }
@@ -281,6 +282,12 @@ export const usePuzzleStore = create<PuzzleStoreState>((set, get) => ({
     });
   },
 
+  getProgress: () => {
+    const { pieces, unionFind, solved } = get();
+    if (solved || pieces.length <= 1) return 100;
+    const roots = new Set(pieces.map((piece) => unionFind.find(piece.id)));
+    return Math.round((100 * (pieces.length - roots.size)) / (pieces.length - 1));
+  },
   groupIdOf: (pieceId) => get().unionFind.find(pieceId),
   groupMembersOf: (pieceId) => get().unionFind.groupMembers(pieceId),
 }));
