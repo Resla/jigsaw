@@ -21,13 +21,8 @@ export function CategoryPage() {
     setStoredPieceCount(value);
   };
 
-  const titleBrand =
-    category && (category.slug === 'kids-easy' || category.slug === 'animals' || category.slug === 'hard')
-      ? 'Puzzle Harbour'
-      : 'Jigsaw';
-
   useSeo({
-    title: category ? `${category.seoTitle} | ${titleBrand}` : 'Category Not Found | Jigsaw',
+    title: category ? `${category.seoTitle} | Puzzle Harbour` : 'Category Not Found | Puzzle Harbour',
     description: category ? category.seoDescription : 'That puzzle category could not be found.',
     path: category ? `/category/${category.slug}` : undefined,
     noindex: !category,

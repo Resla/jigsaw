@@ -10,14 +10,20 @@ export function SiteHeader() {
             fill="currentColor"
           />
         </svg>
-        <span className="site-logo-text">Jigsaw</span>
+        <span className="site-logo-text">Puzzle Harbour</span>
       </Link>
       <nav className="site-nav" aria-label="Main">
-        <Link to="/play">Play together</Link>
-        <Link to="/stories">Story Puzzles</Link>
-        <Link to="/spot-it">Spot it</Link>
-        <a href="/#feedback">Feedback</a>
-        <Link to="/my-puzzles">My Puzzles</Link>
+        <Link to="/daily-jigsaw-puzzle">Daily</Link>
+        <Link to={{ pathname: '/', hash: 'browse' }}>Browse</Link>
+        <details className="site-nav-more">
+          <summary>More</summary>
+          <div className="site-nav-more-panel">
+            <Link to="/stories">Story Puzzles</Link>
+            <Link to="/spot-it">Spot it</Link>
+            <Link to="/play">Play together</Link>
+            <Link to="/my-puzzles">My Puzzles</Link>
+          </div>
+        </details>
       </nav>
     </header>
   );

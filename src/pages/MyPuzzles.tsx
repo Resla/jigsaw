@@ -1,42 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { galleryImages } from '../data/gallery';
-import { loadCustomImage } from '../engine/imageStore';
 import { loadPersistedState } from '../engine/persistence';
 import { computeProgress, getPuzzleHistory, removeHistoryEntry, type PuzzleHistoryEntry } from '../engine/puzzleHistory';
 import { formatRelativeTime } from '../engine/relativeTime';
 import { useSeo } from '../hooks/useSeo';
 import { SiteHeader } from '../components/SiteHeader';
-
-function HistoryThumb({ entry }: { entry: PuzzleHistoryEntry }) {
-  const source = entry.source;
-  const [src, setSrc] = useState<string | null>(
-    source.kind === 'gallery' ? galleryImages.find((g) => g.id === source.imageId)?.src ?? null : null,
-  );
-  const [missing, setMissing] = useState(false);
-
-  useEffect(() => {
-    if (source.kind !== 'custom') return;
-    let cancelled = false;
-    loadCustomImage(source.customId)
-      .then((stored) => {
-        if (cancelled) return;
-        if (stored) setSrc(stored.dataUrl);
-        else setMissing(true);
-      })
-      .catch(() => {
-        if (!cancelled) setMissing(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [source]);
-
-  if (missing || !src) {
-    return <div className="history-thumb history-thumb-missing">🧩</div>;
-  }
-  return <img className="history-thumb" src={src} alt={entry.title} />;
-}
+import { HistoryThumb } from '../components/HistoryThumb';
 
 interface RowState {
   entry: PuzzleHistoryEntry;
@@ -46,7 +15,7 @@ interface RowState {
 
 export function MyPuzzles() {
   useSeo({
-    title: 'My Puzzles | Jigsaw',
+    title: 'My Puzzles | Puzzle Harbour',
     description: 'Resume your in-progress jigsaw puzzles or clear out old ones.',
     noindex: true,
   });

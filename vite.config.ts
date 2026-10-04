@@ -19,8 +19,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'Jigsaw — Play Puzzles Online',
-        short_name: 'Jigsaw',
+        name: 'Puzzle Harbour — Free Jigsaw Puzzles',
+        short_name: 'Puzzle Harbour',
         description: 'A cozy, playful jigsaw puzzle game you can play offline, right in your browser.',
         theme_color: '#b3492c',
         background_color: '#f7f2e7',

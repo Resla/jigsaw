@@ -69,6 +69,7 @@ async function loadSiteData() {
 function buildRoutes(galleryImages, categories, storyList = [], spotList = []) {
   const routes = [
     { url: '/', changefreq: 'weekly', priority: 1.0 },
+    { url: '/daily-jigsaw-puzzle', changefreq: 'daily', priority: 0.9 },
     { url: '/stories', changefreq: 'weekly', priority: 0.8 },
     { url: '/play', changefreq: 'weekly', priority: 0.7 },
     { url: '/spot-it', changefreq: 'weekly', priority: 0.7 },
@@ -91,6 +92,7 @@ function buildRoutes(galleryImages, categories, storyList = [], spotList = []) {
 function isRequiredIndexable(url) {
   return (
     url === '/' ||
+    url === '/daily-jigsaw-puzzle' ||
     url === '/stories' ||
     url === '/spot-it' ||
     url.startsWith('/category/') ||

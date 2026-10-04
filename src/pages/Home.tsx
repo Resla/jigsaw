@@ -1,37 +1,90 @@
-import { useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { galleryImages, type GalleryImage } from '../data/gallery';
 import { categories, type CategorySlug } from '../data/categories';
 import { readAndDownscaleImage } from '../engine/imageUtils';
 import { generateCustomImageId, saveCustomImage } from '../engine/imageStore';
-import { getDailyChallengeInfo, getStreak, hasCompletedToday } from '../engine/dailyChallenge';
+import {
+  DAILY_PATH,
+  DAILY_PIECE_COUNT,
+  dailyPlayUrl,
+  getDailyChallengeInfo,
+  getStreak,
+  hasCompletedToday,
+} from '../engine/dailyChallenge';
+import { loadPersistedState } from '../engine/persistence';
+import { computeProgress, getPuzzleHistory, type PuzzleHistoryEntry } from '../engine/puzzleHistory';
 import { useSeo } from '../hooks/useSeo';
 import { SITE_URL, SITE_NAME } from '../data/siteConfig';
 import { SiteHeader } from '../components/SiteHeader';
 import { SiteFooter } from '../components/SiteFooter';
 import { FeedbackSection } from '../components/FeedbackSection';
 import { GalleryArt } from '../components/LivingPicture';
-import { DifficultyChips } from '../components/DifficultyChips';
+import { HistoryThumb } from '../components/HistoryThumb';
 import { stories } from '../data/stories';
 import { spotPuzzles } from '../data/spotIt';
-import {
-  MAX_PIECES,
-  MIN_PIECES,
-  ROTATION_PREF_KEY,
-  getStoredBoolPref,
-  getStoredPieceCount,
-  setStoredBoolPref,
-  setStoredPieceCount,
-} from '../engine/playPrefs';
+import { ROTATION_PREF_KEY, getStoredBoolPref, getStoredPieceCount } from '../engine/playPrefs';
 
 const FEATURED_STORY = stories[0];
 const FEATURED_SPOT = spotPuzzles[0];
 const PLAY_COVER = galleryImages.find((image) => image.id === 'curious-puppy');
 
-const SAMPLE_IDS = ['sunny-pals', 'curious-puppy', 'tropical-beach', 'starry-night', 'sitting-cat'];
-const samplePictures = SAMPLE_IDS.map((id) => galleryImages.find((image) => image.id === id)).filter(
+const NEW_PUZZLE_IDS = [
+  'tower-bridge-night',
+  'clownfish-anemone',
+  'sushi-platter',
+  'pink-peony',
+  'ring-nebula',
+  'shibuya-crossing',
+  'provence-lavender',
+  'breaching-humpback',
+  'margherita-pizza',
+  'milky-way-alps',
+];
+const newPuzzles = NEW_PUZZLE_IDS.map((id) => galleryImages.find((image) => image.id === id)).filter(
   (image): image is GalleryImage => Boolean(image),
 );
+
+const CONTINUE_LIMIT = 3;
+const CONTINUE_MIN_PERCENT = 15;
+
+const HERO_COVER_IDS = [
+  'clownfish-anemone',
+  'tower-bridge-night',
+  'pink-peony',
+  'sushi-platter',
+  'tropical-beach',
+  'starry-night',
+  'curious-puppy',
+  'provence-lavender',
+  'blue-macaw',
+  'wildflower-coast',
+];
+
+interface ContinueRow {
+  entry: PuzzleHistoryEntry;
+  percent: number;
+}
+
+function loadContinueRows(): ContinueRow[] {
+  const rows: ContinueRow[] = [];
+  for (const entry of getPuzzleHistory()) {
+    const saved = loadPersistedState(entry.storageKey);
+    if (!saved || saved.solved) continue;
+    const percent = computeProgress(saved.groupMap, entry.pieceCount);
+    if (percent < CONTINUE_MIN_PERCENT || percent >= 100) continue;
+    rows.push({ entry, percent });
+    if (rows.length === CONTINUE_LIMIT) break;
+  }
+  return rows;
+}
+
+function pickHeroImage(dailyImage: GalleryImage): GalleryImage {
+  if (HERO_COVER_IDS.includes(dailyImage.id)) return dailyImage;
+  return (
+    galleryImages.find((image) => HERO_COVER_IDS.includes(image.id) && image.id !== dailyImage.id) ?? dailyImage
+  );
+}
 
 const CATEGORY_COVERS: Record<CategorySlug, string> = {
   animals: 'curious-puppy',
@@ -96,24 +149,34 @@ const HOME_FAQS: { question: string; answer: string; link?: { to: string; label:
 
 export function Home() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [daily] = useState(getDailyChallengeInfo);
   const [streak] = useState(getStreak);
   const [completedToday] = useState(hasCompletedToday);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [pieceCount, setPieceCountState] = useState(getStoredPieceCount);
-  const [rotationEnabled, setRotationEnabled] = useState(() => getStoredBoolPref(ROTATION_PREF_KEY, false));
+  const [pieceCount] = useState(getStoredPieceCount);
+  const [rotationEnabled] = useState(() => getStoredBoolPref(ROTATION_PREF_KEY, false));
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [continueRows, setContinueRows] = useState<ContinueRow[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const selectedImage = galleryImages.find((image) => image.id === selectedId) ?? null;
+  const heroImage = pickHeroImage(daily.image);
+  const heroIsDaily = heroImage.id === daily.image.id;
+
+  useEffect(() => {
+    setContinueRows(loadContinueRows());
+  }, []);
+
+  useEffect(() => {
+    if (location.hash !== '#browse') return;
+    document.getElementById('browse')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [location.hash]);
 
   useSeo({
     title: 'Free Online Jigsaw Puzzles, Story Puzzles & Spot It | Puzzle Harbour',
     description:
       'Play free online jigsaw puzzles in your browser. Choose from 24 to 500 pieces, try the daily puzzle, Story Puzzles, Spot It challenges, multiplayer, or use your own photo.',
     path: '/',
-    image: FEATURED_STORY?.beats[0]?.src,
+    image: heroImage.src,
     jsonLd: [
       {
         '@context': 'https://schema.org',
@@ -138,25 +201,10 @@ export function Home() {
     ],
   });
 
-  const choosePieces = (value: number) => {
-    setPieceCountState(value);
-    setStoredPieceCount(value);
-  };
-
-  const toggleRotation = () => {
-    setRotationEnabled((prev) => {
-      const next = !prev;
-      setStoredBoolPref(ROTATION_PREF_KEY, next);
-      return next;
-    });
-  };
-
   const optionsQuery = () => `rotate=${rotationEnabled ? 1 : 0}`;
 
-  const startPuzzle = () => {
-    if (!selectedId) return;
-    navigate(`/puzzle/${selectedId}?pieces=${pieceCount}&${optionsQuery()}`);
-  };
+  const puzzleUrl = (image: GalleryImage) =>
+    `/puzzle/${image.id}?pieces=${image.animated ? 24 : pieceCount}&${optionsQuery()}`;
 
   const handleFileChosen = async (file: File | undefined) => {
     if (!file) return;
@@ -182,128 +230,173 @@ export function Home() {
     <div className="home-page">
       <SiteHeader />
 
-      <header className="home-hero">
-        <h1>Free jigsaw puzzles, right in your browser</h1>
-        <p>Pick a picture, choose a piece count, and start. No download or sign-up.</p>
-      </header>
+      <section className="hp-hero" aria-labelledby="hp-hero-heading">
+        <div className="hp-hero-copy">
+          <span className="hp-eyebrow">{galleryImages.length} free puzzles · new one every day</span>
+          <h1 id="hp-hero-heading">Free jigsaw puzzles, right in your browser</h1>
+          <p>
+            Pick a picture and start snapping pieces — from a gentle 24 up to 500. No download, no sign-up, and
+            it works on your phone.
+          </p>
+          <div className="hp-hero-actions">
+            <a href="#browse" className="btn btn-primary hp-cta">
+              Browse puzzles
+            </a>
+          </div>
+          {streak > 0 && <p className="hp-streak">🔥 {streak}-day daily streak — keep it going</p>}
+        </div>
 
-      <section className="home-section" aria-label="Play together, Story Puzzles, and Spot it">
-        <h2 className="gallery-heading">Play together, Story Puzzles &amp; Spot it</h2>
-        <div className="home-entry-grid">
-          <Link to="/play" className="home-entry-card">
-            <span className="home-entry-thumb">
-              {PLAY_COVER && (
-                <GalleryArt src={PLAY_COVER.src} title={PLAY_COVER.title} animated={PLAY_COVER.animated} />
-              )}
+        <div className="hp-daily">
+          <Link
+            to={heroIsDaily ? dailyPlayUrl(daily) : puzzleUrl(heroImage)}
+            className="hp-daily-card"
+            aria-label={
+              heroIsDaily ? `Play today’s puzzle: ${heroImage.title}` : `Start ${heroImage.title}`
+            }
+          >
+            <span className="hp-daily-image">
+              <GalleryArt src={heroImage.src} title={heroImage.title} animated={heroImage.animated} />
             </span>
-            <span className="home-entry-copy">
-              <strong>Play together</strong>
-              <span>Share a code and race</span>
+            <span className="hp-daily-badge">
+              {heroIsDaily
+                ? `Daily #${daily.dayNumber}${completedToday ? ' · Solved ✓' : ''}`
+                : 'Start here'}
             </span>
-          </Link>
-          <Link to="/stories" className="home-entry-card">
-            <span className="home-entry-thumb">
-              <img src={FEATURED_STORY.beats[0].src} alt="" />
-            </span>
-            <span className="home-entry-copy">
-              <strong>Story Puzzles</strong>
-              <span>Read, then assemble</span>
-            </span>
-          </Link>
-          <Link to="/spot-it" className="home-entry-card">
-            <span className="home-entry-thumb">
-              <img src={FEATURED_SPOT.src} alt="" />
-            </span>
-            <span className="home-entry-copy">
-              <strong>Spot it</strong>
-              <span>Find what does not belong</span>
+            <span className="hp-daily-caption">
+              <strong>{heroImage.title}</strong>
+              <span>
+                {heroIsDaily
+                  ? `${DAILY_PIECE_COUNT} pieces · same picture for everyone today`
+                  : 'A bright picture to start with — tap to play'}
+              </span>
             </span>
           </Link>
+          {heroIsDaily ? (
+            <Link to={DAILY_PATH} className="hp-daily-more">
+              Past daily puzzles and how streaks work →
+            </Link>
+          ) : (
+            <Link to={dailyPlayUrl(daily)} className="hp-daily-strip">
+              <span>
+                Daily #{daily.dayNumber}
+                {completedToday ? ' · Solved' : ''}
+              </span>
+              <strong>{daily.image.title}</strong>
+              <span>Play today’s 100-piece puzzle →</span>
+            </Link>
+          )}
         </div>
       </section>
 
-      <section className="home-section home-jigsaw-block" aria-label="Jigsaw puzzles">
-        <h2 className="gallery-heading">Jigsaws</h2>
-        <div className="jigsaw-controls">
-          <span className="jigsaw-controls-label">Difficulty</span>
-          <DifficultyChips pieceCount={pieceCount} onChange={choosePieces} />
-        </div>
-
-        <h3 className="gallery-subheading">Today</h3>
-        <Link
-          className="daily-card"
-          to={`/puzzle/${daily.image.id}`}
-          onClick={(event) => {
-            event.preventDefault();
-            navigate(`/puzzle/${daily.image.id}?pieces=${daily.pieceCount}&rotate=0&daily=${daily.date}`);
-          }}
-        >
-          <span className="daily-card-thumb">
-            <GalleryArt src={daily.image.src} title={daily.image.title} animated={daily.image.animated} />
-          </span>
-          <div className="daily-card-body">
-            <span className="daily-card-eyebrow">Today's Challenge — Daily #{daily.dayNumber}</span>
-            <span className="daily-card-title">
-              {completedToday ? 'Solved today — play again?' : "Play today’s puzzle"}
-            </span>
-            {streak > 0 && <span className="daily-card-streak">🔥 {streak}-day streak</span>}
+      {continueRows.length > 0 && (
+        <section className="hp-section" aria-labelledby="hp-continue-heading">
+          <div className="hp-section-head">
+            <h2 id="hp-continue-heading">Continue playing</h2>
+            <Link to="/my-puzzles">All my puzzles</Link>
           </div>
-          <span className="daily-card-arrow">→</span>
-        </Link>
+          <div className="hp-continue-grid">
+            {continueRows.map(({ entry, percent }) => (
+              <Link key={entry.storageKey} to={entry.route} className="hp-continue-card">
+                <HistoryThumb entry={entry} className="hp-continue-thumb" />
+                <span className="hp-continue-body">
+                  <strong>{entry.title}</strong>
+                  <span className="hp-progress" aria-label={`${percent}% complete`}>
+                    <span className="hp-progress-fill" style={{ width: `${percent}%` }} />
+                  </span>
+                  <span className="hp-continue-meta">
+                    {percent}% · {entry.pieceCount} pieces
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
-        <h3 className="gallery-subheading">Browse</h3>
-        <div className="browse-grid">
+      <section className="hp-section" id="browse" aria-labelledby="hp-browse-heading">
+        <div className="hp-section-head">
+          <h2 id="hp-browse-heading">Browse by category</h2>
+        </div>
+        <div className="hp-category-grid">
           {categories.map((category) => {
             const coverId = CATEGORY_COVERS[category.slug];
             const cover = galleryImages.find((image) => image.id === coverId);
             const count = galleryImages.filter((image) => image.categories.includes(category.slug)).length;
             return (
-              <Link key={category.slug} to={`/category/${category.slug}`} className="browse-card">
-                <span className="browse-card-image">
-                  {cover && <GalleryArt src={cover.src} title={cover.title} animated={cover.animated} />}
-                </span>
-                <span className="browse-card-body">
-                  <strong>
-                    {category.emoji} {category.name}
-                  </strong>
-                  <span>{category.tagline}</span>
-                  <em>{count} puzzles</em>
+              <Link key={category.slug} to={`/category/${category.slug}`} className="hp-category-tile">
+                {cover && <GalleryArt src={cover.src} title={cover.title} animated={cover.animated} />}
+                <span className="hp-category-label">
+                  <strong>{category.name}</strong>
+                  <span>{count} puzzles</span>
                 </span>
               </Link>
             );
           })}
         </div>
+      </section>
 
-        <h3 className="gallery-subheading">A few to try</h3>
-        <p className="moving-pictures-lead">Tap a picture, then Start in the bar below.</p>
-        <div className="gallery-grid">
-          <button
-            type="button"
-            className="gallery-card upload-card"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-          >
-            <span className="upload-icon">{isUploading ? '⏳' : '📷'}</span>
-            <span className="gallery-card-title">{isUploading ? 'Processing…' : 'Upload your own photo'}</span>
-          </button>
-          {samplePictures.map((image) => (
-            <Link
-              key={image.id}
-              to={`/puzzle/${image.id}?pieces=${image.animated ? 24 : pieceCount}&${optionsQuery()}`}
-              className={`gallery-card ${selectedId === image.id ? 'selected' : ''}`}
-              onClick={(event) => {
-                event.preventDefault();
-                setSelectedId(image.id);
-                if (image.animated) choosePieces(24);
-              }}
-            >
+      <section className="hp-section" aria-labelledby="hp-new-heading">
+        <div className="hp-section-head">
+          <h2 id="hp-new-heading">New puzzles</h2>
+        </div>
+        <div className="hp-puzzle-grid">
+          {newPuzzles.map((image) => (
+            <Link key={image.id} to={puzzleUrl(image)} className="gallery-card">
               <span className="gallery-card-image">
                 <GalleryArt src={image.src} title={image.title} animated={image.animated} />
-                {image.animated && <span className="gallery-moves-badge">Moves!</span>}
               </span>
               <span className="gallery-card-title">{image.title}</span>
             </Link>
           ))}
+        </div>
+        <button
+          type="button"
+          className="hp-upload"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+        >
+          <span aria-hidden="true">{isUploading ? '⏳' : '📷'}</span>
+          <span>
+            <strong>{isUploading ? 'Processing your photo…' : 'Turn your own photo into a jigsaw'}</strong>
+            <span>It stays on your device — nothing is uploaded to a server.</span>
+          </span>
+        </button>
+      </section>
+
+      <section className="hp-section" aria-labelledby="hp-modes-heading">
+        <div className="hp-section-head">
+          <h2 id="hp-modes-heading">More ways to play</h2>
+        </div>
+        <div className="hp-modes-grid">
+          <Link to="/stories" className="hp-mode-card">
+            <span className="hp-mode-image">
+              <img src={FEATURED_STORY.beats[0].src} alt="" loading="lazy" />
+            </span>
+            <span className="hp-mode-body">
+              <strong>Story Puzzles</strong>
+              <span>Read a short picture story, then solve each scene to unlock the next act.</span>
+            </span>
+          </Link>
+          <Link to="/spot-it" className="hp-mode-card">
+            <span className="hp-mode-image">
+              <img src={FEATURED_SPOT.src} alt="" loading="lazy" />
+            </span>
+            <span className="hp-mode-body">
+              <strong>Spot it</strong>
+              <span>Each busy scene hides five things that don’t belong. How fast can you find them?</span>
+            </span>
+          </Link>
+          <Link to="/play" className="hp-mode-card">
+            <span className="hp-mode-image">
+              {PLAY_COVER && (
+                <GalleryArt src={PLAY_COVER.src} title={PLAY_COVER.title} animated={PLAY_COVER.animated} />
+              )}
+            </span>
+            <span className="hp-mode-body">
+              <strong>Play together</strong>
+              <span>Share a four-letter code and race a friend on the same picture.</span>
+            </span>
+          </Link>
         </div>
       </section>
 
@@ -366,84 +459,6 @@ export function Home() {
 
       <FeedbackSection />
       <SiteFooter />
-
-      <div className={`play-dock ${selectedImage ? 'ready' : ''}`}>
-        <div className="play-dock-inner">
-          {selectedImage ? (
-            <div className="play-dock-pick">
-              {selectedImage.animated ? (
-                <GalleryArt src={selectedImage.src} title={selectedImage.title} animated />
-              ) : (
-                <img src={selectedImage.src} alt="" />
-              )}
-              <div className="play-dock-copy">
-                <strong>{selectedImage.title}</strong>
-                <span>{pieceCount} pieces{rotationEnabled ? ' · rotated' : ''}</span>
-              </div>
-            </div>
-          ) : (
-            <div className="play-dock-copy">
-              <strong>Pick a picture to play</strong>
-              <span>Tap a sample above, then Start</span>
-            </div>
-          )}
-
-          <div className="play-dock-actions">
-            <button
-              type="button"
-              className="play-dock-more"
-              aria-expanded={showMoreOptions}
-              onClick={() => setShowMoreOptions((open) => !open)}
-            >
-              {showMoreOptions ? 'Less' : 'More'}
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary start-button"
-              disabled={!selectedId}
-              onClick={startPuzzle}
-            >
-              Start Puzzle
-            </button>
-          </div>
-
-          {showMoreOptions && (
-            <div className="play-dock-extra">
-              <label className="slider-label" htmlFor="piece-count">
-                Piece count: <strong>{pieceCount}</strong>
-              </label>
-              <input
-                id="piece-count"
-                type="range"
-                min={MIN_PIECES}
-                max={MAX_PIECES}
-                step={1}
-                value={pieceCount}
-                onChange={(e) => choosePieces(Number(e.target.value))}
-                className="slider"
-              />
-              <div className="slider-ticks">
-                <span>{MIN_PIECES}</span>
-                <span>{MAX_PIECES}</span>
-              </div>
-              <label className="rotation-toggle-row">
-                <span>
-                  Rotated pieces <span className="rotation-toggle-hint">(harder — off by default)</span>
-                </span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={rotationEnabled}
-                  className={`toggle-switch ${rotationEnabled ? 'on' : ''}`}
-                  onClick={toggleRotation}
-                >
-                  <span className="toggle-knob" />
-                </button>
-              </label>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }

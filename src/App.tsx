@@ -8,12 +8,15 @@ import { StoryStrip } from './pages/StoryStrip';
 import { PlayTogether } from './pages/PlayTogether';
 import { SpotItPage } from './pages/SpotItPage';
 import { SpotItPlay } from './pages/SpotItPlay';
+import { DailyPage } from './pages/DailyPage';
+import { DAILY_PATH } from './engine/dailyChallenge';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/my-puzzles" element={<MyPuzzles />} />
+      <Route path={DAILY_PATH} element={<DailyPage />} />
       <Route path="/stories" element={<StoriesPage />} />
       <Route path="/spot-it/:slug" element={<SpotItPlay />} />
       <Route path="/spot-it" element={<SpotItPage />} />

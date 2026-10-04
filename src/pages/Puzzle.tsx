@@ -8,7 +8,15 @@ import { ReferencePanel } from '../components/ReferencePanel';
 import { LivingPicture } from '../components/LivingPicture';
 import { usePuzzleImageSource } from '../hooks/usePuzzleImageSource';
 import { formatDuration, getBestTime, saveBestTimeIfBetter } from '../engine/bestTimes';
-import { buildShareText, getDailyChallengeInfo, recordDailyCompletion, shareOrCopy } from '../engine/dailyChallenge';
+import {
+  buildShareText,
+  DAILY_PATH,
+  getDailyChallengeInfo,
+  isPlayableDailyDate,
+  recordDailyCompletion,
+  shareOrCopy,
+  todayDateString,
+} from '../engine/dailyChallenge';
 import { isMuted, setMuted } from '../engine/sfx';
 import { recordPuzzleVisit } from '../engine/puzzleHistory';
 import { buildRaceShareText, buildRaceUrl, parseRaceChallenge } from '../engine/race';
@@ -27,7 +35,7 @@ export function Puzzle() {
   const location = useLocation();
   const dailyDate = searchParams.get('daily');
   const roomCode = searchParams.get('room');
-  const dailyInfo = dailyDate && !roomCode ? getDailyChallengeInfo(dailyDate) : null;
+  const dailyInfo = isPlayableDailyDate(dailyDate) && !roomCode ? getDailyChallengeInfo(dailyDate) : null;
   const requestedPieces = Number(searchParams.get('pieces'));
   const pieceCount = dailyInfo
     ? dailyInfo.pieceCount
@@ -46,6 +54,7 @@ export function Puzzle() {
   const [bestTime, setBestTime] = useState<{ timeMs: number; moves: number } | null>(null);
   const [isNewBest, setIsNewBest] = useState(false);
   const [dailyStreak, setDailyStreak] = useState<number | null>(null);
+  const [solvedElapsedMs, setSolvedElapsedMs] = useState<number | null>(null);
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'shared' | 'failed'>('idle');
   const [raceOutcome, setRaceOutcome] = useState<{ won: boolean; diffMs: number } | null>(null);
   const wasSolved = useRef(false);
@@ -73,8 +82,8 @@ export function Puzzle() {
   const breadcrumbCategory = source && source.categories.length > 0 ? getCategory(source.categories[0]) : undefined;
   useSeo({
     title: source
-      ? `${source.title} Jigsaw Puzzle — Play Free Online | Jigsaw`
-      : 'Jigsaw Puzzle | Jigsaw',
+      ? `${source.title} Jigsaw Puzzle — Play Free Online | Puzzle Harbour`
+      : 'Jigsaw Puzzle | Puzzle Harbour',
     description: source?.seoDescription ?? 'Play a free jigsaw puzzle online in your browser — no download or sign-up required.',
     path: !customId && source ? `/puzzle/${source.id}` : undefined,
     image: !customId ? source?.src : undefined,
@@ -192,6 +201,7 @@ export function Puzzle() {
     if (solved && !wasSolved.current && puzzleId && rows > 0 && cols > 0) {
       wasSolved.current = true;
       const elapsedMs = Date.now() - startedAt;
+      setSolvedElapsedMs(elapsedMs);
       const gotNewBest = saveBestTimeIfBetter(puzzleId, rows, cols, elapsedMs, moves);
       setIsNewBest(gotNewBest);
       setBestTime(getBestTime(puzzleId, rows, cols));
@@ -230,9 +240,10 @@ export function Puzzle() {
     if (!dailyInfo) return;
     const text = buildShareText({
       dayNumber: dailyInfo.dayNumber,
-      timeText: formatDuration(Date.now() - startedAt),
+      timeText: formatDuration(solvedElapsedMs ?? Date.now() - startedAt),
       moves,
       streak: dailyStreak ?? 1,
+      isToday: dailyInfo.date === todayDateString(),
     });
     const result = await shareOrCopy(text);
     setShareStatus(result);
@@ -300,8 +311,12 @@ export function Puzzle() {
   return (
     <div className="puzzle-page">
       <header className="puzzle-header">
-        <Link to={roomCode ? `/play/${roomCode}` : '/'} className="back-link" aria-label={roomCode ? 'Back to room' : 'Back to gallery'}>
-          <span className="back-link-full">{roomCode ? '← Room' : '← Gallery'}</span>
+        <Link
+          to={roomCode ? `/play/${roomCode}` : dailyInfo ? DAILY_PATH : '/'}
+          className="back-link"
+          aria-label={roomCode ? 'Back to room' : dailyInfo ? 'Back to daily puzzle' : 'Back to gallery'}
+        >
+          <span className="back-link-full">{roomCode ? '← Room' : dailyInfo ? '← Daily' : '← Gallery'}</span>
           <span className="back-link-short" aria-hidden="true">
             ←
           </span>
@@ -436,7 +451,7 @@ export function Puzzle() {
                 Your best: {formatDuration(bestTime.timeMs)} ({bestTime.moves} moves)
               </p>
             )}
-            {dailyInfo && dailyStreak !== null && (
+            {dailyInfo && dailyInfo.date === todayDateString() && dailyStreak !== null && dailyStreak > 0 && (
               <p className="streak-line">🔥 {dailyStreak}-day streak</p>
             )}
             {room && (
@@ -476,7 +491,11 @@ export function Puzzle() {
                   )}
                 </>
               )}
-              <Link to={roomCode ? `/play/${roomCode}` : '/'}>{roomCode ? 'Back to room' : 'Choose New Puzzle'}</Link>
+              {dailyInfo ? (
+                <Link to={DAILY_PATH}>More daily puzzles</Link>
+              ) : (
+                <Link to={roomCode ? `/play/${roomCode}` : '/'}>{roomCode ? 'Back to room' : 'Choose New Puzzle'}</Link>
+              )}
             </div>
           </div>
         </div>

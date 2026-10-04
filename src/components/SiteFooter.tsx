@@ -36,6 +36,9 @@ export function SiteFooter() {
               </li>
             ))}
             <li>
+              <Link to="/daily-jigsaw-puzzle">Daily jigsaw puzzle</Link>
+            </li>
+            <li>
               <Link to="/play">Play together</Link>
             </li>
             <li>
