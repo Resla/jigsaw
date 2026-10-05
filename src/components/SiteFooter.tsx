@@ -50,6 +50,11 @@ export function SiteFooter() {
           </ul>
         </div>
       </nav>
+      <p className="site-footer-legal">
+        <Link to="/privacy">Privacy</Link>
+        <span aria-hidden="true"> · </span>
+        <Link to="/terms">Terms</Link>
+      </p>
     </footer>
   );
 }

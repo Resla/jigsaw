@@ -264,6 +264,49 @@ a:hover {
   color: var(--accent);
 }
 
+.site-footer-legal {
+  margin: 28px 0 0;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+}
+
+.site-footer-legal a {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.site-footer-legal a:hover {
+  color: var(--accent);
+}
+
+.legal-page {
+  max-width: 680px;
+}
+
+.legal-page h2 {
+  margin: 28px 0 10px;
+  font-size: 22px;
+}
+
+.legal-page p,
+.legal-page li {
+  color: var(--ink-soft);
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+
+.legal-page p {
+  margin: 0 0 14px;
+}
+
+.not-found-links {
+  margin: 0;
+  padding-left: 1.2em;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 a.story-feature {
   color: inherit;
   text-decoration: none;

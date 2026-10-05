@@ -58,6 +58,49 @@ function isAssetPath(pathname) {
   return last.includes('.');
 }
 
+function isClientOnlyPath(pathname) {
+  return pathname === '/my-puzzles' || pathname.startsWith('/play/') || pathname.startsWith('/puzzle/custom/');
+}
+
+async function fetchAsset(env, request, url) {
+  let response = await env.ASSETS.fetch(new Request(url, request));
+  if (response.status >= 300 && response.status < 400) {
+    const location = response.headers.get('Location');
+    if (location) {
+      response = await env.ASSETS.fetch(new Request(new URL(location, url.origin), request));
+    }
+  }
+  return response;
+}
+
+async function serveHtml(snapshot, status) {
+  return new Response(snapshot.body, {
+    status,
+    headers: {
+      'content-type': 'text/html; charset=utf-8',
+      'cache-control': status === 404 ? 'public, max-age=300' : 'public, max-age=3600',
+    },
+  });
+}
+
+async function serveNotFound(request, env) {
+  const url = new URL(request.url);
+  const snapshot = await fetchAsset(env, request, new URL('/404/index.html', url.origin));
+  if (!snapshot.ok) {
+    return new Response('Not found', { status: 404, headers: { 'content-type': 'text/plain; charset=utf-8' } });
+  }
+  return serveHtml(snapshot, 404);
+}
+
+async function serveSpa(request, env) {
+  const url = new URL(request.url);
+  const snapshot = await fetchAsset(env, request, new URL('/index.html', url.origin));
+  if (!snapshot.ok) {
+    return new Response('App unavailable', { status: 503, headers: { 'content-type': 'text/plain; charset=utf-8' } });
+  }
+  return snapshot;
+}
+
 /** Serve prerendered dist/{path}/index.html for pretty URLs before the SPA shell. */
 async function serveSite(request, env) {
   const url = new URL(request.url);
@@ -66,14 +109,14 @@ async function serveSite(request, env) {
   if ((method === 'GET' || method === 'HEAD') && pathname !== '/' && !isAssetPath(pathname)) {
     const trimmed = pathname.replace(/\/+$/, '');
     if (trimmed) {
-      let snapshot = await env.ASSETS.fetch(new Request(new URL(`${trimmed}/index.html`, url.origin), request));
-      if (snapshot.status >= 300 && snapshot.status < 400) {
-        const location = snapshot.headers.get('Location');
-        if (location) {
-          snapshot = await env.ASSETS.fetch(new Request(new URL(location, url.origin), request));
-        }
+      const snapshot = await fetchAsset(env, request, new URL(`${trimmed}/index.html`, url.origin));
+      if (snapshot.ok) {
+        return trimmed === '/404' ? serveHtml(snapshot, 404) : snapshot;
       }
-      if (snapshot.ok) return snapshot;
+      if (isClientOnlyPath(trimmed)) {
+        return serveSpa(request, env);
+      }
+      return serveNotFound(request, env);
     }
   }
   return env.ASSETS.fetch(request);
@@ -90,7 +133,7 @@ export default {
     if (url.pathname.startsWith('/api/rooms')) {
       return handleRooms(request, env);
     }
-    if (url.pathname === '/robots.txt' || url.pathname === '/sitemap.xml') {
+    if (url.pathname === '/robots.txt' || url.pathname === '/sitemap.xml' || url.pathname === '/ads.txt') {
       const asset = await env.ASSETS.fetch(request);
       if (asset.ok) {
         const type =

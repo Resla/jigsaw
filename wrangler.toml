@@ -11,9 +11,10 @@ custom_domain = true
 directory = "./dist"
 binding = "ASSETS"
 # Map /category/animals → dist/category/animals/index.html (prerender snapshots).
-# "none" + SPA fallback was serving the homepage shell for every pretty URL.
+# SPA fallback would serve the homepage for unknown pretty URLs; the worker
+# returns /404 for those and only falls back to the app for client-only routes.
 html_handling = "drop-trailing-slash"
-not_found_handling = "single-page-application"
+not_found_handling = "none"
 run_worker_first = true
 
 [durable_objects]

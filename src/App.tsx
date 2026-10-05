@@ -9,6 +9,8 @@ import { PlayTogether } from './pages/PlayTogether';
 import { SpotItPage } from './pages/SpotItPage';
 import { SpotItPlay } from './pages/SpotItPlay';
 import { DailyPage } from './pages/DailyPage';
+import { PrivacyPage, TermsPage } from './pages/LegalPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 import { DAILY_PATH } from './engine/dailyChallenge';
 
 function App() {
@@ -26,6 +28,10 @@ function App() {
       <Route path="/category/:slug" element={<CategoryPage />} />
       <Route path="/puzzle/custom/:customId" element={<Puzzle />} />
       <Route path="/puzzle/:imageId" element={<Puzzle />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/404" element={<NotFoundPage />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

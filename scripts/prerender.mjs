@@ -17,7 +17,16 @@ import { chromium } from 'playwright';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
-const PORT = 4173 + Math.floor(Math.random() * 1000);
+// Chrome blocks a few ports in this range (SIP). Skip them so prerender can load.
+const UNSAFE_PORTS = new Set([5060, 5061]);
+function pickPort() {
+  for (let i = 0; i < 20; i++) {
+    const port = 4173 + Math.floor(Math.random() * 1000);
+    if (!UNSAFE_PORTS.has(port)) return port;
+  }
+  return 4173;
+}
+const PORT = pickPort();
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -42,6 +51,9 @@ const REQUIRED_SNAPSHOTS = [
   '/puzzle/autumn-forest',
   '/stories',
   '/spot-it/night-carnival',
+  '/privacy',
+  '/terms',
+  '/404',
 ];
 
 async function loadSiteData() {
@@ -73,6 +85,8 @@ function buildRoutes(galleryImages, categories, storyList = [], spotList = []) {
     { url: '/stories', changefreq: 'weekly', priority: 0.8 },
     { url: '/play', changefreq: 'weekly', priority: 0.7 },
     { url: '/spot-it', changefreq: 'weekly', priority: 0.7 },
+    { url: '/privacy', changefreq: 'yearly', priority: 0.3 },
+    { url: '/terms', changefreq: 'yearly', priority: 0.3 },
   ];
   for (const category of categories) {
     routes.push({ url: `/category/${category.slug}`, changefreq: 'weekly', priority: 0.8 });
@@ -95,6 +109,8 @@ function isRequiredIndexable(url) {
     url === '/daily-jigsaw-puzzle' ||
     url === '/stories' ||
     url === '/spot-it' ||
+    url === '/privacy' ||
+    url === '/terms' ||
     url.startsWith('/category/') ||
     url.startsWith('/puzzle/') ||
     url.startsWith('/story/') ||
@@ -324,17 +340,22 @@ async function main() {
   console.log('Loading site data (gallery + categories)...');
   const { galleryImages, categories, stories, spotPuzzles, SITE_URL } = await loadSiteData();
   const routes = buildRoutes(galleryImages, categories, stories, spotPuzzles);
-  console.log(`Found ${routes.length} public routes to prerender.`);
+  const snapshots = [...routes, { url: '/404', changefreq: 'yearly', priority: 0 }];
+  console.log(`Found ${routes.length} public routes to prerender (+ /404).`);
 
   console.log('Starting local static server...');
   const server = await startStaticServer();
 
   try {
     console.log('Prerendering routes with headless Chromium...');
-    await prerenderRoutes(routes, SITE_URL);
+    await prerenderRoutes(snapshots, SITE_URL);
     console.log('Writing robots.txt and sitemap.xml...');
     await writeRobotsAndSitemap(routes, SITE_URL);
     await validateRequiredSnapshots(routes, SITE_URL);
+    const notFoundHtml = await readFile(snapshotPath('/404'), 'utf-8');
+    if (!/noindex/i.test(notFoundHtml) || !/Page not found/i.test(extractTitle(notFoundHtml))) {
+      throw new Error('/404 snapshot must be a noindex “Page not found” page');
+    }
   } catch (err) {
     console.error('Prerender failed. Production build aborted.');
     console.error(err instanceof Error ? err.message : err);
