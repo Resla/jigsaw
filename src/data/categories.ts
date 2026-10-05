@@ -50,7 +50,14 @@ export const categories: CategoryDef[] = [
     seoDescription:
       'Free online nature and landscape jigsaw puzzles — mountains, fjords, forests, deserts, and beaches. Play instantly in your browser, no download needed.',
     intro:
-      'Sweeping mountain ranges, quiet fjords, and sun-drenched beaches — these nature and landscape jigsaw puzzles are great for slowing down and losing an hour. Every puzzle is free to play right in your browser.',
+      'Sweeping mountain ranges, quiet fjords, and sun-drenched beaches — plus classic landscape paintings of the sort you would find on a boxed jigsaw: a cottage by a stream, a poppy meadow, a mill under a big sky. Every puzzle is free to play right in your browser.',
+    about: {
+      heading: 'Landscape paintings as jigsaws',
+      paragraphs: [
+        'A lot of landscape jigsaws sold in shops are paintings, not photographs: Constable’s cottage and wagon, Monet’s poppies, a Dutch mill, a mountain lake with deer. Those pictures are in this category too, next to the photo landscapes.',
+        'Painted scenes often play more like a boxed puzzle because the brushwork gives you colour changes to follow. The Hay Wain and the poppy field are a good place to start; The Harvesters and Among the Sierra Nevada stay interesting at higher piece counts.',
+      ],
+    },
   },
   {
     slug: 'art',

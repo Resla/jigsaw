@@ -704,4 +704,67 @@ export const galleryImages: GalleryImage[] = [
     seoDescription:
       'Turquoise Moraine Lake in Banff, with the Valley of the Ten Peaks mirrored in still water. A classic mountain-lake jigsaw puzzle, free online.',
   },
+  {
+    id: 'hay-wain',
+    title: 'The Hay Wain',
+    src: '/images/landscape-hay-wain.jpg',
+    credit: 'John Constable, public domain via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:John_Constable_-_The_Hay_Wain_(1821).jpg',
+    categories: ['nature', 'art', 'hard'],
+    seoDescription:
+      'Constable’s The Hay Wain: a Suffolk cottage, a wagon in the stream, and a wide English sky. A classic landscape-painting jigsaw of the kind you would buy in a box.',
+  },
+  {
+    id: 'sierra-nevada',
+    title: 'Among the Sierra Nevada',
+    src: '/images/landscape-sierra-nevada.jpg',
+    credit: 'Albert Bierstadt, public domain via Wikimedia Commons',
+    creditUrl:
+      'https://commons.wikimedia.org/wiki/File:Albert_Bierstadt_-_Among_the_Sierra_Nevada,_California_-_Google_Art_Project.jpg',
+    categories: ['nature', 'art', 'hard'],
+    seoDescription:
+      'Bierstadt’s mountain lake in the Sierra Nevada, with deer at the water and sun through the mist. A dramatic painted landscape jigsaw, free to play online.',
+  },
+  {
+    id: 'the-harvesters',
+    title: 'The Harvesters',
+    src: '/images/landscape-harvesters.jpg',
+    credit: 'Pieter Bruegel the Elder, public domain via Wikimedia Commons',
+    creditUrl:
+      'https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder-_The_Harvesters_-_Google_Art_Project.jpg',
+    categories: ['nature', 'art', 'hard'],
+    seoDescription:
+      'Bruegel’s The Harvesters: golden wheat, a village lunch under a tree, and fields rolling to the sea. A busy landscape painting that feels like a boxed jigsaw.',
+  },
+  {
+    id: 'poppy-field-argenteuil',
+    title: 'Poppy Field near Argenteuil',
+    src: '/images/landscape-poppy-field.jpg',
+    credit: 'Claude Monet, public domain via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Poppy_Field_-_Google_Art_Project.jpg',
+    categories: ['nature', 'art', 'flowers'],
+    seoDescription:
+      'Monet’s poppy field near Argenteuil — a hillside of red flowers, a blue parasol, and a summer sky. A classic landscape-painting jigsaw, free to play online.',
+  },
+  {
+    id: 'wheat-field-cypresses',
+    title: 'Wheat Field with Cypresses',
+    src: '/images/landscape-wheat-cypresses.jpg',
+    credit: 'Vincent van Gogh, public domain via Wikimedia Commons',
+    creditUrl:
+      'https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Wheat_Field_with_Cypresses_(National_Gallery_version).jpg',
+    categories: ['nature', 'art'],
+    seoDescription:
+      'Van Gogh’s Wheat Field with Cypresses: swirling clouds, a tall cypress, and a gold field in Provence. A painterly landscape jigsaw, free to play online.',
+  },
+  {
+    id: 'ruisdael-windmill',
+    title: 'The Windmill at Wijk',
+    src: '/images/landscape-ruisdael-mill.jpg',
+    credit: 'Jacob van Ruisdael, public domain via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:The_Windmill_at_Wijk_bij_Duurstede_1670_Ruisdael.jpg',
+    categories: ['nature', 'art'],
+    seoDescription:
+      'Ruisdael’s windmill on the river at Wijk bij Duurstede, under a heavy Dutch sky. A painted landscape of the sort you would find on a boxed jigsaw puzzle.',
+  },
 ];
