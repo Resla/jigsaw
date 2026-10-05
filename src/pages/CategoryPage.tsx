@@ -124,6 +124,11 @@ export function CategoryPage() {
       </div>
 
       {images.length === 0 && <p className="category-empty">No puzzles in this category yet — check back soon.</p>}
+      {category.slug === 'nature' && (
+        <p className="page-hero-lead">
+          Want a bigger challenge? Try our <Link to="/category/hard">Hard Jigsaw Puzzles</Link>.
+        </p>
+      )}
       {category.slug === 'animals' && (
         <p className="page-hero-lead">
           Each picture opens as a free jigsaw in your browser. Choose a piece count above, then tap a scene to

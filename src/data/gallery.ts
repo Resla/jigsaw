@@ -571,4 +571,137 @@ export const galleryImages: GalleryImage[] = [
     seoDescription:
       'The Milky Way rising over mountains and pine forest at Oeschinensee, Switzerland. Thousands of stars make this a hard space jigsaw.',
   },
+  {
+    id: 'trinity-long-room',
+    title: 'Trinity College Long Room',
+    src: '/images/hard-trinity-library.jpg',
+    credit: 'Photo: Diliff, CC BY-SA 4.0 via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Long_Room_Interior,_Trinity_College_Dublin,_Ireland_-_Diliff.jpg',
+    categories: ['hard'],
+    seoDescription:
+      'The Long Room at Trinity College Dublin, with two storeys of old books and a barrel-vaulted ceiling. A dense interior jigsaw that stays tricky up to 500 pieces.',
+  },
+  {
+    id: 'milan-cathedral',
+    title: 'Milan Cathedral',
+    src: '/images/city-milan-cathedral.jpg',
+    credit: 'Photo: Jiuguang Wang, CC BY-SA 3.0 via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Milan_Cathedral_from_Piazza_del_Duomo.jpg',
+    categories: ['cities', 'hard'],
+    seoDescription:
+      'Milan’s Gothic cathedral from the piazza, crowded with spires and statues. A detailed architecture jigsaw puzzle, free to play online.',
+  },
+  {
+    id: 'notre-dame-rose',
+    title: 'Notre-Dame Rose Window',
+    src: '/images/art-notre-dame-rose.jpg',
+    credit: 'Photo: Julie Anne Workman, CC BY-SA 3.0 via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:North_rose_window_of_Notre-Dame_de_Paris,_Aug_2010.jpg',
+    categories: ['art', 'hard'],
+    seoDescription:
+      'The north rose window of Notre-Dame de Paris: hundreds of stained-glass medallions in a dark stone frame. A genuinely hard online jigsaw.',
+  },
+  {
+    id: 'hunters-in-the-snow',
+    title: 'Hunters in the Snow',
+    src: '/images/art-hunters-snow.jpg',
+    credit: 'Pieter Bruegel the Elder, public domain via Wikimedia Commons',
+    creditUrl:
+      'https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg',
+    categories: ['art', 'hard'],
+    seoDescription:
+      'Bruegel’s Hunters in the Snow: a winter village, skaters on the ice, and a hunting party coming home. A busy classic-art jigsaw, free online.',
+  },
+  {
+    id: 'garden-of-earthly-delights',
+    title: 'The Garden of Earthly Delights',
+    src: '/images/art-bosch-delights.jpg',
+    credit: 'Hieronymus Bosch, public domain via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution.jpg',
+    categories: ['art', 'hard'],
+    seoDescription:
+      'Bosch’s Garden of Earthly Delights triptych, packed with tiny figures and strange inventions. One of the hardest free art jigsaws on the site.',
+  },
+  {
+    id: 'alhambra-court',
+    title: 'Court of the Myrtles, Alhambra',
+    src: '/images/city-alhambra.jpg',
+    credit: 'Photo: Jebulon, CC0 via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Patio_de_los_Arrayanes_Alhambra_Granada_Spain.jpg',
+    categories: ['cities', 'hard'],
+    seoDescription:
+      'The Court of the Myrtles at the Alhambra in Granada, with a long reflecting pool and Moorish arches. A calm-looking puzzle that gets hard at high piece counts.',
+  },
+  {
+    id: 'neuschwanstein-castle',
+    title: 'Neuschwanstein Castle',
+    src: '/images/city-neuschwanstein.jpg',
+    credit: 'Photo: Tauno Räsänen, CC BY-SA 3.0 via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Neuschwanstein_Castle_from_Marienbr%C3%BCcke,_2011_May.jpg',
+    categories: ['cities', 'hard'],
+    seoDescription:
+      'Neuschwanstein Castle above the Bavarian forest, seen from Marienbrücke. Towers, windows, and trees make a detailed free architecture jigsaw.',
+  },
+  {
+    id: 'prague-old-town',
+    title: 'Prague Old Town Square',
+    src: '/images/city-prague.jpg',
+    credit: 'Photo: A.Savin, Free Art License via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Prague_07-2016_View_from_Old_Town_Hall_Tower_img3.jpg',
+    categories: ['cities', 'hard'],
+    seoDescription:
+      'Prague’s Old Town Square from the town-hall tower: red roofs, the Týn Church, and a busy cobbled square. A dense city jigsaw up to 500 pieces.',
+  },
+  {
+    id: 'hoh-rain-forest',
+    title: 'Hoh Rain Forest',
+    src: '/images/nature-hoh-rainforest.jpg',
+    credit: 'Photo: PKThundr7, CC BY 4.0 via Wikimedia Commons',
+    creditUrl:
+      'https://commons.wikimedia.org/wiki/File:Hall_of_Mosses,_Hoh_Rainforest,_Olympic_National_Park,_Washington_(2015).jpg',
+    categories: ['nature'],
+    seoDescription:
+      'A mossy stream in the Hoh Rain Forest, Olympic National Park. Fallen logs and hanging moss make a quiet, green nature jigsaw, free online.',
+  },
+  {
+    id: 'twelve-apostles',
+    title: 'Twelve Apostles, Victoria',
+    src: '/images/nature-twelve-apostles.jpg',
+    credit: 'Photo: Dietmar Rabich, CC BY-SA 4.0 via Wikimedia Commons',
+    creditUrl:
+      'https://commons.wikimedia.org/wiki/File:Princetown_(AU),_Port_Campbell_National_Park,_Twelve_Apostles_--_2019_--_0930.jpg',
+    categories: ['nature'],
+    seoDescription:
+      'The Twelve Apostles sea stacks off Victoria’s coast, with limestone cliffs and a long sandy beach. A free coastal landscape jigsaw puzzle.',
+  },
+  {
+    id: 'tre-cime-dolomites',
+    title: 'Tre Cime di Lavaredo',
+    src: '/images/nature-tre-cime.jpg',
+    credit: 'Photo: Wolfgang Moroder, CC BY-SA 3.0 via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Drei_Zinnen_Tre_Cime_di_Lavaredo_Dolomites.jpg',
+    categories: ['nature'],
+    seoDescription:
+      'The snow-covered Tre Cime peaks in the Dolomites, rising through a sea of cloud. A striking mountain jigsaw puzzle, free to play online.',
+  },
+  {
+    id: 'skogafoss',
+    title: 'Skógafoss Waterfall',
+    src: '/images/nature-skogafoss.jpg',
+    credit: 'Photo: Alexander Grebenkov, CC BY 3.0 via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Sk%C3%B3gafoss_from_below.jpg',
+    categories: ['nature'],
+    seoDescription:
+      'Skógafoss in Iceland, a wide curtain of water dropping into a mossy green amphitheatre. A free waterfall jigsaw puzzle to play online.',
+  },
+  {
+    id: 'moraine-lake',
+    title: 'Moraine Lake',
+    src: '/images/nature-moraine-lake.jpg',
+    credit: 'Photo: Gorgo, public domain via Wikimedia Commons',
+    creditUrl: 'https://commons.wikimedia.org/wiki/File:Moraine_Lake_17092005.jpg',
+    categories: ['nature'],
+    seoDescription:
+      'Turquoise Moraine Lake in Banff, with the Valley of the Ten Peaks mirrored in still water. A classic mountain-lake jigsaw puzzle, free online.',
+  },
 ];

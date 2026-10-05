@@ -132,7 +132,7 @@ const HOME_FAQS: { question: string; answer: string; link?: { to: string; label:
     question: 'How hard can the puzzles get?',
     answer:
       'As hard as you like. Most pictures play well at 24, 48, or 100 pieces. The hard category is built for dense detail, and any puzzle can go up to 500 pieces.',
-    link: { to: '/category/hard', label: 'Hard jigsaw puzzles' },
+    link: { to: '/category/hard', label: 'Hard Jigsaw Puzzles' },
   },
   {
     question: 'Can I play jigsaw puzzles with friends?',

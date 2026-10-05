@@ -27,7 +27,10 @@ export function StoriesPage() {
         <h1>
           <span aria-hidden="true">📖</span> Story Puzzles
         </h1>
-        <p className="page-hero-lead">Read the picture. Put it together. The next act opens when you finish.</p>
+        <p className="page-hero-lead">
+          Read the picture. Put it together. The next act opens when you finish. The art-caper story is{' '}
+          <Link to="/story/great-museum-heist">The Great Museum Heist</Link>.
+        </p>
       </header>
 
       <div className="story-feature-list">
@@ -37,7 +40,7 @@ export function StoriesPage() {
           const finished = isStoryFinished(story.slug, story.beats.length);
           return (
             <Link key={story.slug} to={`/story/${story.slug}`} className="story-feature">
-              {cover && <img src={cover.src} alt="" />}
+              {cover && <img src={cover.src} alt={story.title} />}
               <div className="story-feature-copy">
                 <p className="story-book-act">{story.beats.length} acts</p>
                 <h2>
